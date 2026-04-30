@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secret Garden</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b0f;
+      --surface: rgba(255,255,255,0.03);
+      --surface2: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --text: #eef2f7;
+      --muted: #8b95a8;
+      --green: #4ade80;
+      --green-soft: rgba(74,222,128,0.15);
+      --teal: #2dd4bf;
+      --teal-soft: rgba(45,212,191,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(74,222,128,0.07), transparent 28%),
+        radial-gradient(circle at 85% 75%, rgba(45,212,191,0.06), transparent 25%),
+        linear-gradient(160deg, #060809 0%, #080d0b 50%, #060809 100%);
+      background-attachment: fixed;
+      padding: 0 0 80px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: -100px; left: -80px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      filter: blur(100px);
+      background: rgba(74,222,128,0.06);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      right: -80px; bottom: -100px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      filter: blur(100px);
+      background: rgba(45,212,191,0.05);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(8,11,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #4ade80 20%, #2dd4bf 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-logout {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 7px 14px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .btn-add {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(45,212,191,0.2));
+      border: 1px solid rgba(74,222,128,0.35);
+      color: var(--green);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .btn-add:hover {
+      background: linear-gradient(135deg, rgba(74,222,128,0.32), rgba(45,212,191,0.28));
+      box-shadow: 0 0 20px rgba(74,222,128,0.2);
+      transform: scale(1.08);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 0;
+    }
+
+    .post {
+      background: linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 4px 24px rgba(0,0,0,0.4);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .post::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: linear-gradient(180deg, rgba(74,222,128,0.7), rgba(45,212,191,0.7));
+      opacity: 0.5;
+    }
+
+    .post:hover {
+      border-color: rgba(74,222,128,0.2);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 4px 32px rgba(74,222,128,0.06),
+        0 8px 40px rgba(0,0,0,0.5);
+    }
+    .post:hover::before { opacity: 1; }
+
+    .post-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .post-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e8f5e9;
+      line-height: 1.4;
+    }
+
+    .post-time {
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .post-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .post-img {
+      margin-top: 14px;
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .post-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--teal);
+      text-decoration: none;
+      background: var(--teal-soft);
+      border: 1px solid rgba(45,212,191,0.2);
+      border-radius: 8px;
+      padding: 5px 12px;
+      transition: background 0.2s;
+      word-break: break-all;
+    }
+    .post-link:hover { background: rgba(45,212,191,0.2); }
+
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+    .empty-text { font-size: 0.9rem; opacity: 0.6; line-height: 1.7; }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: linear-gradient(145deg, #0e1512, #0a110e);
+      border: 1px solid rgba(74,222,128,0.18);
+      border-radius: 22px;
+      padding: 32px 28px;
+      width: min(520px, 100%);
+      box-shadow:
+        0 0 40px rgba(74,222,128,0.08),
+        0 24px 80px rgba(0,0,0,0.7);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, #4ade80 20%, #2dd4bf 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 24px;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 11px 14px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(74,222,128,0.4);
+      box-shadow: 0 0 0 3px rgba(74,222,128,0.08);
+    }
+    .field textarea { min-height: 100px; }
+    .field input::placeholder,
+    .field textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+    .attach-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn-attach {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px dashed var(--border2);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      padding: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-attach:hover, .btn-attach.active {
+      border-color: rgba(74,222,128,0.4);
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .attach-preview { display: none; margin-bottom: 16px; }
+    .attach-preview.show { display: block; }
+    .attach-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .url-field { display: none; }
+    .url-field.show { display: block; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .btn-cancel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .btn-submit {
+      background: linear-gradient(135deg, rgba(74,222,128,0.22), rgba(45,212,191,0.2));
+      border: 1px solid rgba(74,222,128,0.4);
+      border-radius: 10px;
+      color: #d1fae5;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, rgba(74,222,128,0.35), rgba(45,212,191,0.3));
+      box-shadow: 0 0 20px rgba(74,222,128,0.15);
+    }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    #fileInput { display: none; }
+
+    /* ── Header buttons ── */
+    .btn-guide {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 7px 14px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-guide:hover { background: rgba(74,222,128,0.1); color: var(--green); border-color: rgba(74,222,128,0.3); }
+
+    .btn-admin {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 7px 14px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-admin:hover { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.3); }
+
+    /* ── Delete button on posts ── */
+    .btn-delete {
+      display: none;
+      position: absolute;
+      top: 14px; right: 14px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px;
+      color: #f87171;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .btn-delete:hover { background: rgba(239,68,68,0.25); }
+    body.admin-mode .btn-delete { display: block; }
+    body.admin-mode .card-arrow { display: none; }
+
+    /* ── Guide modal ── */
+    .guide-modal {
+      background: linear-gradient(145deg, #0a120e, #080f0b);
+      border: 1px solid rgba(74,222,128,0.18);
+      border-radius: 22px;
+      padding: 36px 32px;
+      width: min(560px, 100%);
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 0 40px rgba(74,222,128,0.08), 0 24px 80px rgba(0,0,0,0.7);
+    }
+
+    .guide-modal::-webkit-scrollbar { display: none; }
+
+    .guide-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #4ade80 20%, #2dd4bf 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    .guide-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+      letter-spacing: 0.06em;
+    }
+
+    .guide-section {
+      margin-bottom: 24px;
+    }
+
+    .guide-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: var(--green-soft);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 6px;
+      padding: 3px 10px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .guide-text {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .guide-text strong { color: var(--text); font-weight: 600; }
+
+    .guide-rule {
+      background: rgba(74,222,128,0.04);
+      border: 1px solid rgba(74,222,128,0.1);
+      border-left: 3px solid rgba(74,222,128,0.5);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Admin password modal ── */
+    .admin-modal {
+      background: linear-gradient(145deg, #110a0a, #0f0808);
+      border: 1px solid rgba(239,68,68,0.18);
+      border-radius: 22px;
+      padding: 32px 28px;
+      width: min(360px, 100%);
+      box-shadow: 0 0 40px rgba(239,68,68,0.06), 0 24px 80px rgba(0,0,0,0.7);
+    }
+
+    .admin-modal-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #f87171;
+      margin-bottom: 20px;
+      letter-spacing: 0.06em;
+    }
+
+    .admin-pw-input {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 11px 14px;
+      outline: none;
+      font-family: inherit;
+      letter-spacing: 0.1em;
+      transition: border-color 0.2s;
+      margin-bottom: 14px;
+    }
+    .admin-pw-input:focus { border-color: rgba(239,68,68,0.5); }
+    .admin-pw-input::placeholder { color: rgba(255,255,255,0.2); letter-spacing: 0; }
+
+    .admin-error { display: none; font-size: 0.8rem; color: #f87171; margin-bottom: 12px; }
+    .admin-error.show { display: block; }
+
+    .btn-admin-enter {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.18));
+      border: 1px solid rgba(239,68,68,0.35);
+      border-radius: 10px;
+      color: #fecaca;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-admin-enter:hover { background: linear-gradient(135deg, rgba(239,68,68,0.32), rgba(220,38,38,0.28)); }
+
+    /* admin mode indicator */
+    .admin-badge {
+      display: none;
+      font-size: 0.7rem;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 6px;
+      color: #f87171;
+      padding: 3px 8px;
+    }
+    body.admin-mode .admin-badge { display: inline-block; }
+    body.admin-mode .btn-admin { color: #f87171; border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.08); }
+
+    @media (max-width: 600px) {
+      body { padding: 0 0 100px; background-attachment: scroll; }
+
+      .header {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .logo { font-size: 1rem; }
+      .logo-sub { font-size: 0.62rem; }
+
+      .header-right { gap: 6px; }
+      .btn-logout, .btn-guide, .btn-admin { font-size: 0.68rem; padding: 5px 8px; }
+
+      .btn-add { width: 36px; height: 36px; font-size: 1.3rem; }
+
+      .content { padding: 16px 12px 0; }
+
+      .post {
+        padding: 16px 14px 14px 18px;
+        border-radius: 14px;
+        -webkit-tap-highlight-color: rgba(74,222,128,0.06);
+      }
+      .post:active { transform: scale(0.98); transition: transform 0.1s; }
+      .post-title { font-size: 0.95rem; }
+      .post-body { font-size: 0.85rem; }
+      .post-time { font-size: 0.68rem; }
+      .post-img { max-height: 240px; }
+
+      .btn-delete { font-size: 0.68rem; padding: 3px 8px; top: 10px; right: 10px; }
+
+      .modal, .guide-modal, .admin-modal {
+        padding: 22px 18px;
+        border-radius: 18px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-title, .guide-title { font-size: 1rem; }
+      .field input, .field textarea { font-size: 0.88rem; padding: 10px 12px; }
+      .field textarea { min-height: 80px; }
+      .btn-attach { font-size: 0.76rem; padding: 8px 6px; }
+      .btn-submit, .btn-cancel, .btn-admin-enter { font-size: 0.82rem; padding: 9px 14px; }
+
+      .guide-text { font-size: 0.82rem; }
+      .guide-rule { font-size: 0.8rem; }
+    }
+
+    @media (max-width: 380px) {
+      .btn-guide, .btn-admin { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div>
+      <div class="logo">🌿 SECRET GARDEN <span class="admin-badge">관리자 모드</span></div>
+      <div class="logo-sub">1학년 9반 · 비밀의 정원</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-logout" id="btnLogout">← 나가기</button>
+      <button class="btn-guide" id="btnGuide">📖 설명서</button>
+      <button class="btn-admin" id="btnAdmin">🔧 관리자</button>
+      <button class="btn-add" id="btnAdd" title="글 쓰기">+</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div id="feed"><div class="loading">불러오는 중...</div></div>
+  </div>
+
+  <!-- 설명서 모달 -->
+  <div class="overlay" id="guideOverlay">
+    <div class="guide-modal">
+      <div class="guide-title">📖 Secret Garden 설명서</div>
+      <div class="guide-sub">1학년 9반 전용 비밀 공간</div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">이곳은 무엇인가요?</div>
+        <div class="guide-text">
+          <strong>Secret Garden</strong>은 <strong>1학년 9반</strong> 친구들끼리만 사용하는 비밀 공간입니다.<br>
+          외부 사람들은 비밀번호를 모르기 때문에 절대 접근할 수 없어요.
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">어떻게 쓰나요?</div>
+        <div class="guide-text">
+          오른쪽 위 <strong>+ 버튼</strong>을 누르면 글을 쓸 수 있어요.<br>
+          제목과 내용을 입력하고, 사진이나 URL도 첨부할 수 있습니다.
+        </div>
+        <div class="guide-rule">
+          🖼 <strong>사진 첨부</strong> — 이미지 파일을 업로드하면 글에 사진이 표시돼요.<br>
+          🔗 <strong>URL 첨부</strong> — 링크를 첨부하면 카드에 바로 이동 버튼이 생겨요.
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">어떤 걸 올리면 좋나요?</div>
+        <div class="guide-text">
+          우리 반끼리 공유하고 싶지만 <strong>다른 반이나 외부인에게는 보여주기 싫은 자료</strong>를 올려보세요.
+        </div>
+        <div class="guide-rule">
+          📚 시험 대비 자료, 정리 노트<br>
+          🎯 반끼리 공유할 링크, 유용한 사이트<br>
+          💬 우리 반만 아는 이야기, 공지사항<br>
+          🖼 추억 사진, 함께 찍은 사진
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">주의사항</div>
+        <div class="guide-rule">
+          🔒 비밀번호는 우리 반 친구들에게만 알려주세요.<br>
+          ⚠️ 다른 사람을 불쾌하게 하는 글은 올리지 마세요.<br>
+          🌿 모두가 편하게 사용할 수 있는 공간으로 유지해요.
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+        <button class="btn-cancel" id="btnGuideClose">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 관리자 비밀번호 모달 -->
+  <div class="overlay" id="adminOverlay">
+    <div class="admin-modal">
+      <div class="admin-modal-title">🔧 관리자 패널</div>
+      <input class="admin-pw-input" id="adminPwInput" type="password" placeholder="관리자 비밀번호" autocomplete="off" />
+      <div class="admin-error" id="adminError">비밀번호가 틀렸습니다.</div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-cancel" id="btnAdminCancel" style="flex:1;">취소</button>
+        <button class="btn-admin-enter" id="btnAdminEnter" style="flex:2;">입장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 글쓰기 모달 -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="modal-title">✦ 새 글 쓰기</div>
+
+      <div class="field">
+        <label>제목</label>
+        <input type="text" id="inpTitle" placeholder="제목을 입력하세요" maxlength="100" />
+      </div>
+
+      <div class="field">
+        <label>내용</label>
+        <textarea id="inpBody" placeholder="하고 싶은 말을 적어보세요..."></textarea>
+      </div>
+
+      <div class="attach-row">
+        <button class="btn-attach" id="btnImg">🖼 사진 첨부</button>
+        <button class="btn-attach" id="btnUrl">🔗 URL 첨부</button>
+      </div>
+
+      <input type="file" id="fileInput" accept="image/*" />
+
+      <div class="field url-field" id="urlField">
+        <label>URL</label>
+        <input type="url" id="inpUrl" placeholder="https://..." />
+      </div>
+
+      <div class="attach-preview" id="attachPreview"></div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btnCancel">취소</button>
+        <button class="btn-submit" id="btnSubmit">올리기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 토큰 검증
+    (async () => {
+      const token = sessionStorage.getItem('sg_token');
+      if (!token) { window.location.href = '/'; return; }
+      try {
+        const res  = await fetch('/api/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        if (!data.valid) window.location.href = '/';
+      } catch {
+        window.location.href = '/';
+      }
+    })();
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      sessionStorage.removeItem('sg_token');
+      window.location.href = '/';
+    });
+
+    const API = '/api/posts';
+    let attachMode = null;
+    let imageBase64 = null;
+
+    async function loadPosts() {
+      const feed = document.getElementById('feed');
+      try {
+        const token = sessionStorage.getItem('sg_token') || '';
+        const res = await fetch(API, { headers: { 'Authorization': 'Bearer ' + token } });
+        const posts = await res.json();
+        if (!Array.isArray(posts) || !posts.length) {
+          feed.innerHTML = `<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">아직 아무도 글을 남기지 않았어요.<br>첫 번째 글을 남겨보세요!</div></div>`;
+          return;
+        }
+        feed.innerHTML = posts.map(renderPost).join('');
+      } catch {
+        feed.innerHTML = `<div class="empty"><div class="empty-text">불러오기에 실패했습니다.</div></div>`;
+      }
+    }
+
+    function renderPost(p) {
+      const date = new Date(p.created_at);
+      const timeStr = `${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+      let extra = '';
+      if (p.image_url) extra += `<img class="post-img" src="${escHtml(p.image_url)}" alt="" loading="lazy" />`;
+      if (p.link_url) {
+        const display = escHtml(p.link_url.replace(/^https?:\/\//,'').slice(0,60));
+        const safeUrl = /^https?:\/\//i.test(p.link_url) ? p.link_url : 'https://' + p.link_url;
+        extra += `<a class="post-link" href="${escHtml(safeUrl)}" target="_blank" rel="noopener">↗ ${display}</a>`;
+      }
+      return `<div class="post" data-id="${p.id}">
+        <button class="btn-delete" onclick="deletePost(${p.id})">삭제</button>
+        <div class="post-header">
+          <div class="post-title">${escHtml(p.title)}</div>
+          <div class="post-time">${timeStr}</div>
+        </div>
+        ${p.body ? `<div class="post-body">${escHtml(p.body)}</div>` : ''}
+        ${extra}
+      </div>`;
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    const overlay   = document.getElementById('overlay');
+    const btnAdd    = document.getElementById('btnAdd');
+    const btnCancel = document.getElementById('btnCancel');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnImg    = document.getElementById('btnImg');
+    const btnUrl    = document.getElementById('btnUrl');
+    const urlField  = document.getElementById('urlField');
+    const fileInput = document.getElementById('fileInput');
+    const preview   = document.getElementById('attachPreview');
+
+    function openModal() { overlay.classList.add('open'); document.getElementById('inpTitle').focus(); }
+    function closeModal() { overlay.classList.remove('open'); resetForm(); }
+    function resetForm() {
+      ['inpTitle','inpBody','inpUrl'].forEach(id => document.getElementById(id).value = '');
+      urlField.classList.remove('show');
+      preview.classList.remove('show');
+      preview.innerHTML = '';
+      btnImg.classList.remove('active');
+      btnUrl.classList.remove('active');
+      fileInput.value = '';
+      attachMode = null;
+      imageBase64 = null;
+    }
+
+    btnAdd.addEventListener('click', openModal);
+    btnCancel.addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+    btnImg.addEventListener('click', () => {
+      attachMode = 'image';
+      urlField.classList.remove('show');
+      btnImg.classList.add('active');
+      btnUrl.classList.remove('active');
+      fileInput.click();
+    });
+
+    btnUrl.addEventListener('click', () => {
+      const showing = urlField.classList.contains('show');
+      urlField.classList.toggle('show');
+      btnUrl.classList.toggle('active', !showing);
+      if (!showing) {
+        attachMode = 'url';
+        btnImg.classList.remove('active');
+        imageBase64 = null;
+        preview.classList.remove('show');
+        preview.innerHTML = '';
+      } else {
+        attachMode = null;
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        imageBase64 = e.target.result;
+        preview.innerHTML = `<img src="${imageBase64}" />`;
+        preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    btnSubmit.addEventListener('click', async () => {
+      const title = document.getElementById('inpTitle').value.trim();
+      const body  = document.getElementById('inpBody').value.trim();
+      const url   = document.getElementById('inpUrl').value.trim();
+      if (!title) { document.getElementById('inpTitle').focus(); return; }
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = '올리는 중...';
+      try {
+        const payload = { title, body };
+        if (attachMode === 'image' && imageBase64) payload.image_base64 = imageBase64;
+        if (attachMode === 'url' && url) payload.link_url = url;
+
+        const token = sessionStorage.getItem('sg_token') || '';
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) { closeModal(); loadPosts(); }
+        else { alert('오류가 발생했습니다. 다시 시도해주세요.'); }
+      } catch { alert('서버 오류가 발생했습니다.'); }
+      finally { btnSubmit.disabled = false; btnSubmit.textContent = '올리기'; }
+    });
+
+    loadPosts();
+
+    // ── 설명서 ──
+    document.getElementById('btnGuide').addEventListener('click', () => {
+      document.getElementById('guideOverlay').classList.add('open');
+    });
+    document.getElementById('btnGuideClose').addEventListener('click', () => {
+      document.getElementById('guideOverlay').classList.remove('open');
+    });
+    document.getElementById('guideOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('guideOverlay'))
+        document.getElementById('guideOverlay').classList.remove('open');
+    });
+
+    // ── 관리자 ──
+    const adminOverlay  = document.getElementById('adminOverlay');
+    const adminPwInput  = document.getElementById('adminPwInput');
+    const adminError    = document.getElementById('adminError');
+    const ADMIN_PW      = 'adnin00';
+
+    document.getElementById('btnAdmin').addEventListener('click', () => {
+      if (document.body.classList.contains('admin-mode')) {
+        document.body.classList.remove('admin-mode');
+        return;
+      }
+      adminPwInput.value = '';
+      adminError.classList.remove('show');
+      adminOverlay.classList.add('open');
+      setTimeout(() => adminPwInput.focus(), 100);
+    });
+
+    document.getElementById('btnAdminCancel').addEventListener('click', () => {
+      adminOverlay.classList.remove('open');
+    });
+
+    document.getElementById('btnAdminEnter').addEventListener('click', checkAdminPw);
+    adminPwInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAdminPw(); });
+
+    function checkAdminPw() {
+      if (adminPwInput.value === ADMIN_PW) {
+        adminOverlay.classList.remove('open');
+        document.body.classList.add('admin-mode');
+      } else {
+        adminError.classList.add('show');
+        adminPwInput.value = '';
+        adminPwInput.focus();
+      }
+    }
+
+    // ── 삭제 ──
+    async function deletePost(id) {
+      if (!confirm('이 글을 삭제할까요?')) return;
+      try {
+        const token = sessionStorage.getItem('sg_token') || '';
+        const res = await fetch(`/api/posts?id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+        if (res.ok) {
+          document.querySelector(`.post[data-id="${id}"]`)?.remove();
+          if (!document.querySelector('.post')) loadPosts();
+        }
+      } catch { alert('삭제 실패'); }
+    }
+    window.deletePost = deletePost;
+  </script>
+</body>
+</html>
