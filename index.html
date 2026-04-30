@@ -389,6 +389,21 @@
       gap: 8px;
     }
 
+    .mobile-search-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(10px);
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .mobile-search-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
     .search-box {
       display: flex;
       align-items: center;
@@ -399,8 +414,17 @@
       padding: 10px 18px;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      width: 320px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 0;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: width 0.3s ease, opacity 0.25s ease, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box.open {
+      width: 280px;
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .search-box:focus-within {
@@ -413,10 +437,6 @@
       color: var(--muted);
       flex-shrink: 0;
       user-select: none;
-    }
-
-    .mobile-search-btn {
-      display: none;
     }
 
     .search-input {
@@ -521,17 +541,6 @@
       /* 모바일 돋보기 버튼 */
       .mobile-search-btn {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 8px;
-        color: var(--muted);
-        font-size: 1rem;
-        width: 36px;
-        height: 36px;
-        cursor: pointer;
-        flex-shrink: 0;
       }
 
       .search-box {
@@ -825,7 +834,7 @@
     <p class="logo-notice mobile-notice">학특사, 프로젝트 등의 링크를 연동시키고 싶은 분은 관리자 카카오톡 개인 톡으로 연락바랍니다.</p>
 
     <footer class="footer">
-      <div>© 2026 1-9 &nbsp;All rights reserved.</div>
+      <div>© 2026 DSHS 1-9 &nbsp;All rights reserved.</div>
       <div style="margin-top:6px;">Developed by <span style="color:rgba(250,204,21,0.55);">Choi ju yeong</span></div>
     </footer>
 
