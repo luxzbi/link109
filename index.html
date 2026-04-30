@@ -193,17 +193,31 @@
     }
 
     .card.simulator::before {
-      background: linear-gradient(180deg, rgba(52,211,153,0.8), rgba(250,204,21,0.8));
+      background: linear-gradient(180deg, rgba(253,224,71,0.8), rgba(251,146,60,0.8));
     }
 
     .card.simulator:hover {
-      border-color: rgba(52, 211, 153, 0.4);
+      border-color: rgba(253,224,71,0.4);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.07),
-        0 0 24px rgba(52,211,153,0.12),
-        0 0 36px rgba(250,204,21,0.08),
+        0 0 24px rgba(253,224,71,0.12),
+        0 0 36px rgba(251,146,60,0.08),
         0 16px 48px rgba(0,0,0,0.55);
-      background: linear-gradient(145deg, rgba(52,211,153,0.07), rgba(250,204,21,0.05));
+      background: linear-gradient(145deg, rgba(253,224,71,0.07), rgba(251,146,60,0.05));
+    }
+
+    .card.highsystem::before {
+      background: linear-gradient(180deg, rgba(74,222,128,0.8), rgba(168,85,247,0.8));
+    }
+
+    .card.highsystem:hover {
+      border-color: rgba(74,222,128,0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(74,222,128,0.12),
+        0 0 36px rgba(168,85,247,0.1),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(74,222,128,0.07), rgba(168,85,247,0.05));
     }
 
     .card.flashcard::before {
@@ -779,11 +793,11 @@
     <!-- 시크릿가든 카테고리 -->
     <section class="section">
       <div class="section-header">
-        <span class="section-label highsystem">HIGH SYSTEM</span>
+        <span class="section-label highsystem">Way_Tech system</span>
         <div class="section-line"></div>
       </div>
       <div class="grid">
-        <a class="card" href="https://plax-eta.vercel.app" target="_blank" rel="noopener">
+        <a class="card highsystem" href="https://plax-eta.vercel.app" target="_blank" rel="noopener">
           <span class="card-arrow">↗</span>
           <div class="card-name">Secret Garden</div>
           <div class="card-url">plax-eta.vercel.app</div>
