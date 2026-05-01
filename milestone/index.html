@@ -483,9 +483,11 @@
       .top-logo .logo-text { font-size: 0.75rem; letter-spacing: 0.18em; }
       .back-btn { top: 0.85rem; right: 1rem; font-size: 0.68rem; padding: 0.22rem 0.65rem; }
 
-      /* 중앙 hero 로고 — 모바일에서는 top-logo가 있으므로 숨김 */
-      .logo { display: none; }
-      .logo-sub { display: none; }
+      /* 중앙 hero 로고 — 모바일에서도 검색박스 위에 표시, 검색 중엔 숨김 */
+      .logo { font-size: 1.3rem; letter-spacing: 0.28em; }
+      .logo-sub { display: block; font-size: 0.65rem; }
+      .hero.shrunk .logo { display: none; }
+      .hero.shrunk .logo-sub { display: none; }
 
       /* hero: 검색창만 보이도록 */
       .hero {
