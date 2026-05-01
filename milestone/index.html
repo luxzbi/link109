@@ -496,12 +496,12 @@
         justify-content: center;
       }
 
-      /* 검색 중: hero를 화면 상단에 딱 붙여서 검색창이 잘 보이도록 */
+      /* 검색 중: hero를 화면 맨 위에 sticky */
       .hero.shrunk {
         min-height: 0;
         height: auto;
-        padding-top: 4rem;   /* top-logo/back-btn 높이 확보 */
-        padding-bottom: 0.8rem;
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
         justify-content: flex-start;
         position: sticky;
         top: 0;
@@ -510,7 +510,8 @@
         border-bottom: 1px solid rgba(255,255,255,0.06);
       }
 
-      .search-area { max-width: 100%; margin-top: 0; }
+      /* 부제목과 검색박스 사이 여백 */
+      .search-area { max-width: 100%; margin-top: 1.2rem; }
       .hero.shrunk .search-area { margin-top: 0; }
       .search-inner { border-radius: 14px; padding: 0.7rem 0.85rem 0.6rem; }
       #q { font-size: 16px; }
