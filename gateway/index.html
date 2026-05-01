@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GATEWAY — DSHS 1-9</title>
   <style>
-    :root { --mint: #2dd4bf; --purple: #c084fc; --bg: #0a0a0f; --card-bg: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.08); --text: #e2e8f0; --subtext: #94a3b8; }
+    :root { --mint: #f87171; --purple: #c084fc; --bg: #0a0a0f; --card-bg: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.08); --text: #e2e8f0; --subtext: #94a3b8; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 60% 40% at 20% 20%, rgba(45,212,191,0.08) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(192,132,252,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 60% 40% at 20% 20%, rgba(248,113,113,0.08) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(192,132,252,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
     header { padding: 1.4rem 2rem 1rem; display: flex; align-items: center; gap: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; position: relative; z-index: 1; }
     .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.12em; background: linear-gradient(135deg, var(--mint), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .header-sub { font-size: 0.75rem; color: var(--subtext); letter-spacing: 0.06em; }
@@ -22,11 +22,11 @@
     #search::placeholder { color: var(--subtext); }
     main { padding: 2rem; max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
     .category { margin-bottom: 2.5rem; }
-    .cat-label { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid rgba(45,212,191,0.4); background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(192,132,252,0.10)); color: var(--mint); }
+    .cat-label { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid rgba(248,113,113,0.4); background: linear-gradient(135deg, rgba(248,113,113,0.12), rgba(192,132,252,0.10)); color: var(--mint); }
     .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
     .card { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 0.9rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; text-decoration: none; color: var(--text); transition: background 0.2s, border-color 0.2s, transform 0.15s; position: relative; overflow: hidden; }
-    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, rgba(45,212,191,0.8), rgba(192,132,252,0.8)); border-radius: 3px 0 0 3px; }
-    .card:hover { background: rgba(255,255,255,0.08); border-color: rgba(45,212,191,0.35); transform: translateY(-2px); }
+    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, rgba(248,113,113,0.8), rgba(192,132,252,0.8)); border-radius: 3px 0 0 3px; }
+    .card:hover { background: rgba(255,255,255,0.08); border-color: rgba(248,113,113,0.35); transform: translateY(-2px); }
     .card-icon { font-size: 1.1rem; flex-shrink: 0; }
     .card-text { overflow: hidden; }
     .card-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

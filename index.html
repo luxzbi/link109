@@ -476,6 +476,38 @@
       opacity: 0.6;
     }
 
+    /* ── Quick Bar ── */
+    .quick-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.32rem 1.1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .quick-btn:hover {
+      border-color: rgba(74,222,128,0.4);
+      color: #4ade80;
+      background: rgba(74,222,128,0.06);
+    }
+
     /* ── Footer ── */
     .footer {
       text-align: center;
@@ -678,6 +710,11 @@
 
     <div class="content">
 
+    <!-- 빠른 바로가기 -->
+    <div class="quick-bar">
+      <a class="quick-btn" href="https://link109.xyz/milestone" target="_blank">🔭 Milestone에서 모든 Quasarway project를 검색하세요! ↗</a>
+    </div>
+
     <!-- 학급 카테고리 -->
     <section class="section">
       <div class="section-header">
@@ -813,8 +850,13 @@
         </a>
         <a class="card highsystem" href="/gateway" target="_blank" rel="noopener">
           <span class="card-arrow">↗</span>
-          <div class="card-name">gateway</div>
+          <div class="card-name">Gateway</div>
           <div class="card-url">link109.xyz/gateway</div>
+        </a>
+        <a class="card highsystem" href="/milestone" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">Milestone</div>
+          <div class="card-url">link109.xyz/milestone</div>
         </a>
       </div>
     </section>
