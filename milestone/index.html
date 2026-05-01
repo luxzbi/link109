@@ -356,6 +356,17 @@
         0 16px 50px rgba(0,0,0,0.55);
     }
 
+    /* focus: 클릭만 해도 테두리 글로우 */
+    .ring-wrap:focus-within .search-inner {
+      border-color: rgba(45,212,191,0.4);
+      box-shadow:
+        0 0 0 1px rgba(45,212,191,0.1),
+        0 0 28px rgba(45,212,191,0.15),
+        0 0 60px rgba(45,212,191,0.07),
+        0 16px 50px rgba(0,0,0,0.55);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
     /* ── Results ── */
     #results {
       max-width: 1200px;
