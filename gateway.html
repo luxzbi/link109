@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GATEWAY — DSHS 1-9</title>
+  <style>
+    :root {
+      --mint: #2dd4bf;
+      --purple: #c084fc;
+      --bg: #0a0a0f;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --text: #e2e8f0;
+      --subtext: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 20%, rgba(45,212,191,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 80% 80%, rgba(192,132,252,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      padding: 1.4rem 2rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, var(--mint), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-sub {
+      font-size: 0.75rem;
+      color: var(--subtext);
+      letter-spacing: 0.06em;
+    }
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    .search-toggle-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: var(--subtext);
+      cursor: pointer;
+      padding: 0.4rem 0.7rem;
+      font-size: 1rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .search-toggle-btn:hover { border-color: var(--mint); color: var(--mint); }
+    .search-wrap {
+      display: none;
+      width: 100%;
+      padding: 0.6rem 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      z-index: 1;
+    }
+    .search-wrap.open { display: block; }
+    #search {
+      width: 100%;
+      padding: 0.55rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #search:focus { border-color: var(--mint); }
+    #search::placeholder { color: var(--subtext); }
+
+    main { padding: 2rem; max-width: 1300px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .category { margin-bottom: 2.5rem; }
+    .cat-label {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 6px;
+      border: 1px solid rgba(45,212,191,0.4);
+      background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(192,132,252,0.10));
+      color: var(--mint);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.9rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, rgba(45,212,191,0.8), rgba(192,132,252,0.8));
+      border-radius: 3px 0 0 3px;
+    }
+    .card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(45,212,191,0.35);
+      transform: translateY(-2px);
+    }
+    .card-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .card-text { overflow: hidden; }
+    .card-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-desc {
+      font-size: 0.72rem;
+      color: var(--subtext);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.72rem;
+      color: rgba(148,163,184,0.45);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+      header { padding: 1rem; gap: 0.7rem; }
+      main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="logo">GATEWAY</div>
+      <div class="header-sub">DSHS 1-9 · Curated Links</div>
+    </div>
+    <div class="header-right">
+      <button class="search-toggle-btn" id="search-toggle-btn" title="검색">🔍</button>
+    </div>
+  </header>
+  <div class="search-wrap" id="search-wrap">
+    <input type="text" id="search" placeholder="링크 검색…" oninput="filterCards()" />
+  </div>
+
+  <main id="link-main">
+
+    <div class="category" data-cat="HIGHWAY">
+      <div class="cat-label">HIGHWAY</div>
+      <div class="cards">
+        <a class="card" href="https://link109.xyz" target="_blank" rel="noopener">
+          <span class="card-icon">🛣️</span>
+          <div class="card-text"><div class="card-name">HIGHWAY</div><div class="card-desc">메인 링크허브</div></div>
+        </a>
+        <a class="card" href="https://plax-eta.vercel.app" target="_blank" rel="noopener">
+          <span class="card-icon">🌿</span>
+          <div class="card-text"><div class="card-name">Secret Garden</div><div class="card-desc">비밀 게시판</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="category" data-cat="AI">
+      <div class="cat-label">AI</div>
+      <div class="cards">
+        <a class="card" href="https://claude.ai" target="_blank" rel="noopener">
+          <span class="card-icon">🤖</span>
+          <div class="card-text"><div class="card-name">Claude</div><div class="card-desc">Anthropic AI</div></div>
+        </a>
+        <a class="card" href="https://chatgpt.com" target="_blank" rel="noopener">
+          <span class="card-icon">💬</span>
+          <div class="card-text"><div class="card-name">ChatGPT</div><div class="card-desc">OpenAI</div></div>
+        </a>
+        <a class="card" href="https://gemini.google.com" target="_blank" rel="noopener">
+          <span class="card-icon">✨</span>
+          <div class="card-text"><div class="card-name">Gemini</div><div class="card-desc">Google AI</div></div>
+        </a>
+        <a class="card" href="https://www.perplexity.ai" target="_blank" rel="noopener">
+          <span class="card-icon">🔎</span>
+          <div class="card-text"><div class="card-name">Perplexity</div><div class="card-desc">AI 검색</div></div>
+        </a>
+        <a class="card" href="https://copilot.microsoft.com" target="_blank" rel="noopener">
+          <span class="card-icon">🪟</span>
+          <div class="card-text"><div class="card-name">Copilot</div><div class="card-desc">Microsoft AI</div></div>
+        </a>
+        <a class="card" href="https://grok.com" target="_blank" rel="noopener">
+          <span class="card-icon">⚡</span>
+          <div class="card-text"><div class="card-name">Grok</div><div class="card-desc">xAI</div></div>
+        </a>
+        <a class="card" href="https://notebooklm.google.com" target="_blank" rel="noopener">
+          <span class="card-icon">📓</span>
+          <div class="card-text"><div class="card-name">NotebookLM</div><div class="card-desc">Google NotebookLM</div></div>
+        </a>
+        <a class="card" href="https://deepseek.com" target="_blank" rel="noopener">
+          <span class="card-icon">🐋</span>
+          <div class="card-text"><div class="card-name">DeepSeek</div><div class="card-desc">DeepSeek AI</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="category" data-cat="PPT">
+      <div class="cat-label">PPT</div>
+      <div class="cards">
+        <a class="card" href="https://www.canva.com/create-new" target="_blank" rel="noopener">
+          <span class="card-icon">🎨</span>
+          <div class="card-text"><div class="card-name">Canva</div><div class="card-desc">디자인 툴</div></div>
+        </a>
+        <a class="card" href="https://gamma.app" target="_blank" rel="noopener">
+          <span class="card-icon">🌀</span>
+          <div class="card-text"><div class="card-name">Gamma</div><div class="card-desc">AI 프레젠테이션</div></div>
+        </a>
+        <a class="card" href="https://www.miricanvas.com" target="_blank" rel="noopener">
+          <span class="card-icon">🎀</span>
+          <div class="card-text"><div class="card-name">MiriCanvas</div><div class="card-desc">미리캔버스</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="category" data-cat="3D">
+      <div class="cat-label">3D</div>
+      <div class="cards">
+        <a class="card" href="https://www.tinkercad.com" target="_blank" rel="noopener">
+          <span class="card-icon">🧱</span>
+          <div class="card-text"><div class="card-name">Tinkercad</div><div class="card-desc">3D 모델링</div></div>
+        </a>
+        <a class="card" href="https://www.blender.org" target="_blank" rel="noopener">
+          <span class="card-icon">🫐</span>
+          <div class="card-text"><div class="card-name">Blender</div><div class="card-desc">3D 오픈소스</div></div>
+        </a>
+        <a class="card" href="https://spline.design" target="_blank" rel="noopener">
+          <span class="card-icon">🌐</span>
+          <div class="card-text"><div class="card-name">Spline</div><div class="card-desc">웹 3D 디자인</div></div>
+        </a>
+        <a class="card" href="https://www.unrealengine.com" target="_blank" rel="noopener">
+          <span class="card-icon">🎮</span>
+          <div class="card-text"><div class="card-name">Unreal Engine</div><div class="card-desc">언리얼 엔진</div></div>
+        </a>
+        <a class="card" href="https://unity.com" target="_blank" rel="noopener">
+          <span class="card-icon">🕹️</span>
+          <div class="card-text"><div class="card-name">Unity</div><div class="card-desc">유니티 엔진</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="category" data-cat="Code">
+      <div class="cat-label">Code</div>
+      <div class="cards">
+        <a class="card" href="https://replit.com" target="_blank" rel="noopener">
+          <span class="card-icon">💻</span>
+          <div class="card-text"><div class="card-name">Replit</div><div class="card-desc">온라인 IDE</div></div>
+        </a>
+        <a class="card" href="https://codesandbox.io" target="_blank" rel="noopener">
+          <span class="card-icon">📦</span>
+          <div class="card-text"><div class="card-name">CodeSandbox</div><div class="card-desc">웹 개발 환경</div></div>
+        </a>
+        <a class="card" href="https://codepen.io" target="_blank" rel="noopener">
+          <span class="card-icon">🖊️</span>
+          <div class="card-text"><div class="card-name">CodePen</div><div class="card-desc">HTML/CSS/JS 플레이그라운드</div></div>
+        </a>
+        <a class="card" href="https://github.com" target="_blank" rel="noopener">
+          <span class="card-icon">🐙</span>
+          <div class="card-text"><div class="card-name">GitHub</div><div class="card-desc">코드 저장소</div></div>
+        </a>
+        <a class="card" href="https://code.visualstudio.com" target="_blank" rel="noopener">
+          <span class="card-icon">🔵</span>
+          <div class="card-text"><div class="card-name">VS Code</div><div class="card-desc">Visual Studio Code</div></div>
+        </a>
+        <a class="card" href="https://visualstudio.microsoft.com" target="_blank" rel="noopener">
+          <span class="card-icon">🟣</span>
+          <div class="card-text"><div class="card-name">Visual Studio</div><div class="card-desc">Microsoft IDE</div></div>
+        </a>
+        <a class="card" href="https://developer.android.com/studio?hl=ko" target="_blank" rel="noopener">
+          <span class="card-icon">🤖</span>
+          <div class="card-text"><div class="card-name">Android Studio</div><div class="card-desc">안드로이드 개발</div></div>
+        </a>
+        <a class="card" href="https://kiro.dev" target="_blank" rel="noopener">
+          <span class="card-icon">⚙️</span>
+          <div class="card-text"><div class="card-name">Kiro</div><div class="card-desc">kiro.dev</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="category" data-cat="CodingAI">
+      <div class="cat-label">CodingAI</div>
+      <div class="cards">
+        <a class="card" href="https://v0.dev" target="_blank" rel="noopener">
+          <span class="card-icon">🔷</span>
+          <div class="card-text"><div class="card-name">v0</div><div class="card-desc">Vercel AI 코딩</div></div>
+        </a>
+        <a class="card" href="https://bolt.new" target="_blank" rel="noopener">
+          <span class="card-icon">⚡</span>
+          <div class="card-text"><div class="card-name">Bolt</div><div class="card-desc">AI 앱 빌더</div></div>
+        </a>
+        <a class="card" href="https://lovable.dev" target="_blank" rel="noopener">
+          <span class="card-icon">💖</span>
+          <div class="card-text"><div class="card-name">Lovable</div><div class="card-desc">AI 웹앱 생성</div></div>
+        </a>
+        <a class="card" href="https://cursor.com" target="_blank" rel="noopener">
+          <span class="card-icon">🖱️</span>
+          <div class="card-text"><div class="card-name">Cursor</div><div class="card-desc">AI 코드 에디터</div></div>
+        </a>
+        <a class="card" href="https://windsurf.com" target="_blank" rel="noopener">
+          <span class="card-icon">🏄</span>
+          <div class="card-text"><div class="card-name">Windsurf</div><div class="card-desc">AI IDE</div></div>
+        </a>
+        <a class="card" href="https://openai.com/ko-KR/codex" target="_blank" rel="noopener">
+          <span class="card-icon">🧠</span>
+          <div class="card-text"><div class="card-name">Codex</div><div class="card-desc">OpenAI Codex</div></div>
+        </a>
+        <a class="card" href="https://claude.ai" target="_blank" rel="noopener">
+          <span class="card-icon">🤖</span>
+          <div class="card-text"><div class="card-name">Claude</div><div class="card-desc">AI 코딩 도우미</div></div>
+        </a>
+        <a class="card" href="https://kiro.dev" target="_blank" rel="noopener">
+          <span class="card-icon">⚙️</span>
+          <div class="card-text"><div class="card-name">Kiro</div><div class="card-desc">kiro.dev</div></div>
+        </a>
+        <a class="card" href="https://manus.im" target="_blank" rel="noopener">
+          <span class="card-icon">🦾</span>
+          <div class="card-text"><div class="card-name">Manus</div><div class="card-desc">AI 에이전트</div></div>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>© 2026 DSHS 1-9 All rights reserved. Developed by <span style="color:var(--mint)">Choi ju yeong</span></footer>
+
+<script>
+  document.getElementById('search-toggle-btn').addEventListener('click', () => {
+    const wrap = document.getElementById('search-wrap');
+    const open = wrap.classList.toggle('open');
+    if (open) document.getElementById('search').focus();
+    else { document.getElementById('search').value = ''; filterCards(); }
+  });
+
+  function filterCards() {
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    document.querySelectorAll('.category').forEach(cat => {
+      let visible = 0;
+      cat.querySelectorAll('.card').forEach(card => {
+        const text = card.innerText.toLowerCase();
+        const show = !q || text.includes(q);
+        card.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      cat.style.display = visible === 0 && q ? 'none' : '';
+    });
+  }
+</script>
+</body>
+</html>
