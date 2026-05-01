@@ -439,21 +439,6 @@
       text-overflow: ellipsis;
     }
 
-    .src-badge {
-      font-size: 0.58rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 1px 5px;
-      border-radius: 4px;
-      margin-left: 4px;
-      vertical-align: middle;
-      flex-shrink: 0;
-    }
-
-    .src-hw { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.25); }
-    .src-gw { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
-    .src-ms { background: rgba(45,212,191,0.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
-
     .badge-haktuksa {
       font-size: 0.58rem;
       font-weight: 700;
@@ -535,7 +520,6 @@
       .results-grid { grid-template-columns: 1fr 1fr; gap: 0.45rem; }
       .r-card { padding: 0.55rem 0.65rem; }
       .r-name { font-size: 0.76rem; }
-      .src-badge { display: none; }
     }
 
     @media (max-width: 380px) {
@@ -1034,14 +1018,11 @@ function render() {
     return;
   }
 
-  const srcLabel = {HIGHWAY:'HIGHWAY', GATEWAY:'GATEWAY', MILESTONE:'MILESTONE'};
-  const srcClass = {HIGHWAY:'src-hw', GATEWAY:'src-gw', MILESTONE:'src-ms'};
-
   grid.innerHTML = filtered.map(l => `
     <a class="r-card" href="${l.u}" target="_blank" rel="noopener">
       <span class="r-icon">${l.i}</span>
       <div class="r-text">
-        <div class="r-name">${l.n} <span class="src-badge ${srcClass[l.s]}">${srcLabel[l.s]}</span>${l.haktuksa ? '<span class="badge-haktuksa">학특사</span>' : ''}</div>
+        <div class="r-name">${l.n}${l.haktuksa ? '<span class="badge-haktuksa">학특사</span>' : ''}</div>
         <div class="r-meta">${l.d} · ${l.c}</div>
       </div>
     </a>
