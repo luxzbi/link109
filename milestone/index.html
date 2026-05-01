@@ -120,16 +120,23 @@
       border-radius: 999px;
     }
 
-    /* ── traveling dot (no bar → no corner leak) ── */
+    /* ── traveling beam ── */
     .beam {
       position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 0 6px 2px #2dd4bf, 0 0 14px 5px rgba(45,212,191,0.35);
+      width: 72px;
+      height: 1.5px;
+      border-radius: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(45,212,191,0.25) 20%,
+        rgba(45,212,191,0.8) 45%,
+        rgba(255,255,255,0.95) 55%,
+        rgba(45,212,191,0.8) 65%,
+        rgba(45,212,191,0.25) 80%,
+        transparent 100%
+      );
       offset-distance: 0%;
-      offset-rotate: 0deg;
+      offset-rotate: auto;
       offset-anchor: 50% 50%;
       opacity: 0;
       z-index: 3;
@@ -446,7 +453,7 @@
       .search-area { max-width: 100%; margin-top: 1.8rem; }
       .hero.shrunk .search-area { margin-top: 0.7rem; }
       .search-inner { border-radius: 14px; padding: 0.7rem 0.85rem 0.6rem; }
-      #q { font-size: 0.9rem; }
+      #q { font-size: 16px; } /* 16px 미만이면 iOS가 자동 확대됨 */
       .hero { padding: 1.5rem 1rem; }
       .hero.shrunk { min-height: 120px; padding-top: 1.2rem; }
       .mode-dropdown { min-width: 160px; bottom: calc(100% + 6px); }
