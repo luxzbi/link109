@@ -879,25 +879,25 @@ beam.addEventListener('animationend', () => {
 });
 
 // Search
-input.addEventListener('input', () => {
-  // typing glow
-  if (input.value.length > 0) {
-    ring.classList.add('typing');
-    ring.classList.remove('glow-out');
-  } else {
-    ring.classList.remove('typing');
-  }
+let debounceTimer = null;
 
+input.addEventListener('input', () => {
   query = input.value;
   clr.classList.toggle('visible', query.length > 0);
-  render();
+
   if (query.length > 0) {
+    ring.classList.add('typing');
+    ring.classList.remove('glow-out');
     hero.classList.add('shrunk');
     results.style.display = 'block';
   } else {
+    ring.classList.remove('typing');
     hero.classList.remove('shrunk');
     results.style.display = 'none';
   }
+
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(render, 120);
 });
 
 clr.addEventListener('click', () => {
