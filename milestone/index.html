@@ -946,12 +946,16 @@ input.addEventListener('input', () => {
   if (query.length > 0) {
     ring.classList.add('typing');
     ring.classList.remove('glow-out');
-    hero.classList.add('shrunk');
+    if (!hero.classList.contains('shrunk')) {
+      hero.classList.add('shrunk');
+      window.scrollTo(0, 0);
+    }
     results.style.display = 'block';
   } else {
     ring.classList.remove('typing');
     hero.classList.remove('shrunk');
     results.style.display = 'none';
+    window.scrollTo(0, 0);
   }
 
   clearTimeout(debounceTimer);
@@ -964,6 +968,7 @@ clr.addEventListener('click', () => {
   clr.classList.remove('visible');
   hero.classList.remove('shrunk');
   results.style.display = 'none';
+  window.scrollTo(0, 0);
   input.focus();
 });
 
