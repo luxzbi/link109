@@ -529,11 +529,14 @@
         padding: 0;
       }
 
-      /* 모바일 상단 헤더 고정 */
-      .header {
+      /* 모바일 상단 헤더+검색창 묶어서 sticky */
+      .sticky-bar {
         position: sticky;
         top: 0;
         z-index: 10;
+      }
+
+      .header {
         margin-bottom: 0;
         padding: 16px 20px 14px;
         background: rgba(5, 3, 8, 0.82);
@@ -558,12 +561,12 @@
         letter-spacing: 0.08em;
       }
 
-      /* 검색창: fixed 해제 → 헤더 바로 아래 흐름 배치 */
+      /* 검색창: sticky-bar 안에서 static으로 */
       .search-wrap {
         position: static;
         width: 100%;
         padding: 8px 16px 12px;
-        background: rgba(5, 3, 8, 0.82);
+        background: rgba(5, 3, 8, 0.88);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -693,13 +696,14 @@
 <body>
   <div class="page">
 
+    <div class="sticky-bar">
     <header class="header">
       <h1 class="logo"><span class="logo-accent">HIGHWAY</span></h1>
       <p class="logo-sub">LINK highway &nbsp;·&nbsp; by QUASARWAY</p>
       <p class="logo-notice">학특사, 프로젝트 등의 링크를 연동시키고 싶은 분은 관리자 카카오톡 개인 톡으로 연락바랍니다.</p>
     </header>
 
-    <!-- 검색창 (PC: fixed 우상단 / 모바일: 헤더 바로 아래 토글) -->
+    <!-- 검색창 (PC: fixed 우상단 / 모바일: 헤더 바로 아래 sticky) -->
     <div class="search-wrap">
       <button class="mobile-search-btn" id="mobileSearchBtn">🔍</button>
       <div class="search-box" id="searchBox">
@@ -708,6 +712,7 @@
         <button class="search-clear" id="searchClear">✕</button>
       </div>
     </div>
+    </div><!-- /.sticky-bar -->
 
     <div class="content">
 

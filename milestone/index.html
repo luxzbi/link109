@@ -443,6 +443,21 @@
     .src-gw { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
     .src-ms { background: rgba(45,212,191,0.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
 
+    .badge-haktuksa {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
     .empty {
       text-align: center;
       padding: 5rem 0;
@@ -462,19 +477,45 @@
     }
 
     @media (max-width: 640px) {
-      .top-logo { top: 0.9rem; left: 1rem; }
-      .top-logo .logo-mark { width: 20px; height: 20px; }
-      .top-logo .logo-text { font-size: 0.8rem; letter-spacing: 0.18em; }
-      .logo { font-size: 1.4rem; letter-spacing: 0.28em; }
-      .logo-mark { width: 26px; height: 26px; }
-      .hero.shrunk .logo { font-size: 0.9rem; }
-      .logo-sub { font-size: 0.68rem; }
-      .search-area { max-width: 100%; margin-top: 1.8rem; }
-      .hero.shrunk .search-area { margin-top: 0.7rem; }
+      /* 상단 고정 요소 */
+      .top-logo { top: 0.85rem; left: 1rem; }
+      .top-logo .logo-mark { width: 18px; height: 18px; }
+      .top-logo .logo-text { font-size: 0.75rem; letter-spacing: 0.18em; }
+      .back-btn { top: 0.85rem; right: 1rem; font-size: 0.68rem; padding: 0.22rem 0.65rem; }
+
+      /* 중앙 hero 로고 — 모바일에서는 top-logo가 있으므로 숨김 */
+      .logo { display: none; }
+      .logo-sub { display: none; }
+
+      /* hero: 검색창만 보이도록 */
+      .hero {
+        min-height: 100dvh;
+        padding: 1rem;
+        justify-content: center;
+      }
+
+      /* 검색 중: hero를 화면 상단에 딱 붙여서 검색창이 잘 보이도록 */
+      .hero.shrunk {
+        min-height: 0;
+        height: auto;
+        padding-top: 4rem;   /* top-logo/back-btn 높이 확보 */
+        padding-bottom: 0.8rem;
+        justify-content: flex-start;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--bg);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .search-area { max-width: 100%; margin-top: 0; }
+      .hero.shrunk .search-area { margin-top: 0; }
       .search-inner { border-radius: 14px; padding: 0.7rem 0.85rem 0.6rem; }
-      #q { font-size: 16px; } /* 16px 미만이면 iOS가 자동 확대됨 */
-      .hero { padding: 1.5rem 1rem; }
-      .hero.shrunk { min-height: 120px; padding-top: 1.2rem; }
+      #q { font-size: 16px; }
+
+      /* 빛 애니메이션 모바일에서 비활성화 */
+      .beam.go { animation: none !important; opacity: 0 !important; }
+
       .mode-dropdown { min-width: 160px; bottom: calc(100% + 6px); }
       #results { padding: 1rem 0.85rem 3rem; }
       .results-grid { grid-template-columns: 1fr 1fr; gap: 0.45rem; }
@@ -561,10 +602,10 @@
 <script>
 const LINKS = [
   // ── HIGHWAY ──
-  {n:'1-9 아지트',         u:'https://ds109.life',                 d:'학특사 학급 사이트',       c:'학급',          s:'HIGHWAY', i:'🏠'},
-  {n:'주식게임',           u:'https://ztec.kr',                    d:'학특사 주식게임',           c:'학급',          s:'HIGHWAY', i:'📈'},
-  {n:'CIP 시간표',         u:'https://luxzbi.github.io/CIP/',      d:'학특사 시간표',             c:'학급',          s:'HIGHWAY', i:'📋'},
-  {n:'자습 타이머',        u:'https://luxzbi.github.io/time/',     d:'학특사 타이머 도구',        c:'학급',          s:'HIGHWAY', i:'⏱️'},
+  {n:'1-9 아지트',         u:'https://ds109.life',                 d:'학특사 학급 사이트',       c:'학급',          s:'HIGHWAY', i:'🏠', haktuksa:true},
+  {n:'주식게임',           u:'https://ztec.kr',                    d:'학특사 주식게임',           c:'학급',          s:'HIGHWAY', i:'📈', haktuksa:true},
+  {n:'CIP 시간표',         u:'https://luxzbi.github.io/CIP/',      d:'학특사 시간표',             c:'학급',          s:'HIGHWAY', i:'📋', haktuksa:true},
+  {n:'자습 타이머',        u:'https://luxzbi.github.io/time/',     d:'학특사 타이머 도구',        c:'학급',          s:'HIGHWAY', i:'⏱️', haktuksa:true},
   {n:'betterCIP',          u:'https://bettercip.pages.dev/',       d:'1-9 by kmk',                c:'학급',          s:'HIGHWAY', i:'🗓️'},
   {n:'betterCIP 개인설정', u:'https://bettercip.pages.dev/student',d:'개인 출석 설정',            c:'학급',          s:'HIGHWAY', i:'👤'},
   {n:'클래스룸',           u:'https://classroom.google.com',       d:'Google Classroom',          c:'외부',          s:'HIGHWAY', i:'🏫'},
@@ -576,7 +617,7 @@ const LINKS = [
   {n:'DNA 시뮬레이터',     u:'https://luxzbi.github.io/ss/',       d:'DNA 시뮬레이터',             c:'시뮬레이터',    s:'HIGHWAY', i:'🧬'},
   {n:'볼츠만 뇌 시뮬레이터',u:'https://luxzbi.github.io/chch/',   d:'볼츠만 뇌 이론',            c:'시뮬레이터',    s:'HIGHWAY', i:'🧠'},
   {n:'석굴암 시뮬레이터',  u:'https://luxzbi.github.io/accs',     d:'석굴암 시뮬레이터',          c:'시뮬레이터',    s:'HIGHWAY', i:'🗿'},
-  {n:'Secret Garden',      u:'https://plax-eta.vercel.app',        d:'비밀 게시판',                c:'Quasarway',     s:'HIGHWAY', i:'🌿'},
+  {n:'Secret Garden',      u:'https://plax-eta.vercel.app',        d:'비밀 게시판',                c:'Quasarway',     s:'HIGHWAY', i:'🌿', haktuksa:true},
   {n:'Gateway',            u:'https://link109.xyz/gateway',        d:'종합 링크 허브',             c:'Quasarway',     s:'HIGHWAY', i:'🌐'},
   {n:'Milestone',          u:'https://link109.xyz/milestone',      d:'통합 검색 엔진',             c:'Quasarway',     s:'HIGHWAY', i:'🔭'},
   {n:'과학 질의응답',      u:'https://url.kr/vjfvv3',              d:'수행평가 질의응답',           c:'수행평가',      s:'HIGHWAY', i:'🔬'},
@@ -845,10 +886,12 @@ const results = document.getElementById('results');
 const grid = document.getElementById('grid');
 const meta = document.getElementById('meta');
 
-// Beam animation on focus
+// Beam animation — 페이지 진입 시 1회, 모바일 제외
 const beam = document.getElementById('beam');
+const isMobileDevice = () => window.innerWidth <= 640;
 
 function triggerBeam() {
+  if (isMobileDevice()) return;
   const w = ring.offsetWidth;
   const h = ring.offsetHeight;
   const r = 20; // border-radius matches CSS 20px
@@ -861,7 +904,8 @@ function triggerBeam() {
   beam.classList.add('go');
 }
 
-input.addEventListener('focus', triggerBeam);
+// 페이지 진입 시 자동 실행
+window.addEventListener('load', () => { setTimeout(triggerBeam, 400); });
 
 beam.addEventListener('animationend', () => {
   beam.classList.remove('go');
@@ -978,7 +1022,7 @@ function render() {
     <a class="r-card" href="${l.u}" target="_blank" rel="noopener">
       <span class="r-icon">${l.i}</span>
       <div class="r-text">
-        <div class="r-name">${l.n} <span class="src-badge ${srcClass[l.s]}">${srcLabel[l.s]}</span></div>
+        <div class="r-name">${l.n} <span class="src-badge ${srcClass[l.s]}">${srcLabel[l.s]}</span>${l.haktuksa ? '<span class="badge-haktuksa">학특사</span>' : ''}</div>
         <div class="r-meta">${l.d} · ${l.c}</div>
       </div>
     </a>
