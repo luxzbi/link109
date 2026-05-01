@@ -54,6 +54,25 @@
       border-bottom: 1px solid rgba(255,255,255,0.055);
     }
 
+    .back-btn {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.5rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--sub);
+      text-decoration: none;
+      padding: 0.28rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      transition: color 0.2s, border-color 0.2s;
+      z-index: 50;
+    }
+
+    .back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+
     /* top-left fixed logo */
     .top-logo {
       position: fixed;
@@ -471,6 +490,7 @@
 </head>
 <body>
 
+<a class="back-btn" href="https://link109.xyz">← Highway</a>
 <a class="top-logo" href="/milestone">
   <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="18" cy="18" r="17" stroke="url(#tl1)" stroke-width="1.5"/>
