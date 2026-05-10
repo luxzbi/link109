@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MILESTONE — Search</title>
+  <style>
+    :root {
+      --mint: #2dd4bf;
+      --bg: #040707;
+      --search-bg: #0a0f0f;
+      --card-bg: rgba(255,255,255,0.035);
+      --card-border: rgba(255,255,255,0.07);
+      --text: #e8edf0;
+      --sub: #445a58;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 35% at 50% 0%, rgba(45,212,191,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+      transition: min-height 0.5s cubic-bezier(0.4,0,0.2,1), padding 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .hero.shrunk {
+      min-height: 160px;
+      padding-top: 2rem;
+      padding-bottom: 1.2rem;
+      justify-content: flex-end;
+      border-bottom: 1px solid rgba(255,255,255,0.055);
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.5rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--sub);
+      text-decoration: none;
+      padding: 0.28rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      transition: color 0.2s, border-color 0.2s;
+      z-index: 50;
+    }
+
+    .back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+
+    /* top-left fixed logo */
+    .top-logo {
+      position: fixed;
+      top: 1.2rem;
+      left: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      z-index: 50;
+      text-decoration: none;
+    }
+
+    .top-logo .logo-mark { width: 24px; height: 24px; }
+
+    .top-logo .logo-text {
+      font-size: 0.95rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      transition: width 0.4s, height 0.4s;
+    }
+
+    .hero.shrunk .logo-mark { width: 20px; height: 20px; }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 300;
+      letter-spacing: 0.35em;
+      color: rgba(255,255,255,0.88);
+      line-height: 1;
+      transition: font-size 0.4s cubic-bezier(0.4,0,0.2,1);
+      text-transform: uppercase;
+    }
+
+    .hero.shrunk .logo { font-size: 1.05rem; letter-spacing: 0.4em; }
+
+    .logo-sub {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--sub);
+      letter-spacing: 0.06em;
+      font-weight: 400;
+    }
+
+    .hero.shrunk .logo-sub { display: none; }
+
+    /* ── Search ring ── */
+    .ring-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 999px;
+    }
+
+    /* ── traveling beam ── */
+    .beam {
+      position: absolute;
+      width: 72px;
+      height: 1.5px;
+      border-radius: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(45,212,191,0.25) 20%,
+        rgba(45,212,191,0.8) 45%,
+        rgba(255,255,255,0.95) 55%,
+        rgba(45,212,191,0.8) 65%,
+        rgba(45,212,191,0.25) 80%,
+        transparent 100%
+      );
+      offset-distance: 0%;
+      offset-rotate: auto;
+      offset-anchor: 50% 50%;
+      opacity: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .beam.go { animation: beam-travel 0.78s linear forwards; }
+
+    @keyframes beam-travel {
+      0%   { offset-distance: 0%;   opacity: 1; }
+      85%  { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
+
+    /* ── Search area wrapper ── */
+    .search-area {
+      width: 100%;
+      max-width: 620px;
+      margin-top: 2.8rem;
+      transition: margin-top 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .hero.shrunk .search-area { margin-top: 1rem; }
+
+    /* ── Search box (rounded rect, not pill — chips live inside) ── */
+    .search-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      background: var(--search-bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 0.85rem 1.1rem 0.7rem 1.1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .search-icon {
+      font-size: 0.88rem;
+      opacity: 0.3;
+      flex-shrink: 0;
+    }
+
+    #q {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.97rem;
+      font-weight: 400;
+    }
+
+    #q::placeholder { color: var(--sub); font-weight: 300; }
+
+    .search-clear {
+      background: none;
+      border: none;
+      color: var(--sub);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0;
+      opacity: 0;
+      transition: opacity 0.2s, color 0.2s;
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+    }
+
+    .search-clear.visible { opacity: 0.5; }
+    .search-clear:hover { color: var(--mint); opacity: 1; }
+
+    /* ── Mode selector (Gemini-style dropdown) ── */
+    .mode-bar {
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.38rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 999px;
+      padding: 0.28rem 0.65rem 0.28rem 0.55rem;
+      color: var(--sub);
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+      letter-spacing: 0.02em;
+    }
+
+    .mode-btn:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.16);
+      color: var(--text);
+    }
+
+    .mode-btn.open {
+      background: rgba(45,212,191,0.08);
+      border-color: rgba(45,212,191,0.3);
+      color: var(--mint);
+    }
+
+    .mode-chevron {
+      font-size: 0.6rem;
+      opacity: 0.5;
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+
+    .mode-btn.open .mode-chevron { transform: rotate(90deg); }
+
+    /* dropdown menu */
+    .mode-dropdown {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 1.5rem;
+      min-width: 180px;
+      background: #141a1a;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 0.4rem;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+      animation: drop-in 0.18s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+
+    @keyframes drop-in {
+      from { opacity: 0; transform: translateY(6px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .mode-dropdown.open { display: block; }
+
+    .mode-option {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.8rem;
+      border-radius: 9px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      user-select: none;
+    }
+
+    .mode-option:hover {
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+    }
+
+    .mode-option.active {
+      background: rgba(45,212,191,0.1);
+      color: var(--mint);
+    }
+
+    .mode-option-icon { font-size: 0.88rem; width: 1.2rem; text-align: center; }
+
+    /* ── Glow states ── */
+    /* after beam completes: flash */
+    .ring-wrap.glowing .search-inner {
+      border-color: rgba(45,212,191,0.6);
+      box-shadow:
+        0 0 0 1px rgba(45,212,191,0.15),
+        0 0 22px rgba(45,212,191,0.2),
+        0 0 55px rgba(45,212,191,0.09),
+        0 16px 50px rgba(0,0,0,0.5);
+      transition: border-color 0.1s, box-shadow 0.1s;
+    }
+
+    .ring-wrap.glow-out .search-inner {
+      border-color: rgba(255,255,255,0.08);
+      box-shadow: none;
+      transition: border-color 1.4s ease, box-shadow 1.4s ease;
+    }
+
+    /* while typing: persistent soft glow */
+    .ring-wrap.typing .search-inner {
+      border-color: rgba(45,212,191,0.35);
+      box-shadow:
+        0 0 0 1px rgba(45,212,191,0.08),
+        0 0 28px rgba(45,212,191,0.13),
+        0 0 60px rgba(45,212,191,0.06),
+        0 16px 50px rgba(0,0,0,0.55);
+    }
+
+    /* focus: 클릭만 해도 테두리 글로우 */
+    .ring-wrap:focus-within .search-inner {
+      border-color: rgba(45,212,191,0.4);
+      box-shadow:
+        0 0 0 1px rgba(45,212,191,0.1),
+        0 0 28px rgba(45,212,191,0.15),
+        0 0 60px rgba(45,212,191,0.07),
+        0 16px 50px rgba(0,0,0,0.55);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    /* ── Results ── */
+    #results {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .results-meta {
+      font-size: 0.75rem;
+      color: var(--sub);
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .r-card {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.75rem 0.9rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .r-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, rgba(45,212,191,0.8), rgba(45,212,191,0.2));
+      border-radius: 3px 0 0 3px;
+    }
+
+    .r-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(45,212,191,0.3);
+      transform: translateY(-2px);
+    }
+
+    .r-icon { font-size: 1rem; flex-shrink: 0; }
+
+    .r-text { overflow: hidden; }
+
+    .r-name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .r-meta {
+      font-size: 0.68rem;
+      color: var(--sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge-haktuksa {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 5rem 0;
+      color: var(--sub);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+    }
+
+    <footer>© 2026 DSHS 1-9 &nbsp;All rights reserved. Developed by <span style="color:var(--mint)">Choi ju yeong</span></footer>
+
+    <script>
+    const LINKS = [
+      // ── HIGHWAY ──
+      {n:'1-9 아지트',         u:'https://ds109.life',                 d:'학특사 학급 사이트 (highway)',       c:'학급',          s:'HIGHWAY', i:'🏠', haktuksa:true},
+      {n:'betterCIP',          u:'https://bettercip.pages.dev/',       d:'1-9 by kmk (highway)',                c:'학급',          s:'HIGHWAY', i:'🗓️'},
+      {n:'betterCIP 개인설정', u:'https://bettercip.pages.dev/student',d:'개인 출석 설정 (highway)',            c:'학급',          s:'HIGHWAY', i:'👤'},
+      {n:'클래스룸',           u:'https://classroom.google.com',       d:'Google Classroom (highway)',          c:'외부',          s:'HIGHWAY', i:'🏫'},
+      {n:'슈퍼스쿨',           u:'https://front.superschool.link',     d:'슈퍼스쿨 (highway)',                 c:'외부',          s:'HIGHWAY', i:'🎒'},
+      {n:'dshub',              u:'https://dshub.kro.kr',               d:'dshub (highway)',                     c:'외부',          s:'HIGHWAY', i:'🔗'},
+      {n:'대입과목 가이드',    u:'https://ds109.life/s/6hn1pG',        d:'대입 과목 가이드 (highway)',           c:'외부',          s:'HIGHWAY', i:'📚'},
+      {n:'수강신청 시뮬레이터',u:'https://ds109.life/s/awHj1I',       d:'수강신청 시뮬 (highway)',              c:'외부',          s:'HIGHWAY', i:'🎮'},
+      {n:'학교 홈페이지',      u:'https://www.dshs.kr/',               d:'DSHS 공식 (highway)',                 c:'외부',          s:'HIGHWAY', i:'🏛️'},
+      {n:'CIP 좌석관리',      u:'https://ds109.life/s/7jrSEZ',        d:'학기별 좌석 관리 (highway)',           c:'외부',          s:'HIGHWAY', i:'🪑'},
+      {n:'CIP 불참 예약',      u:'https://ds109.life/s/U7WUev',        d:'CIP 불참석 사유 예약 (highway)',       c:'외부',          s:'HIGHWAY', i:'📅'},
+      {n:'수강신청 프로그램',  u:'https://ds109.life/s/UQOE9Q',        d:'수강신청 자동화 툴 (highway)',         c:'외부',          s:'HIGHWAY', i:'⚡'},
+      {n:'DNA 시뮬레이터',     u:'https://luxzbi.github.io/ss/',       d:'DNA 시뮬레이터 (highway)',             c:'시뮬레이터',    s:'HIGHWAY', i:'🧬'},
+      {n:'볼츠만 뇌 시뮬레이터',u:'https://luxzbi.github.io/chch/',   d:'볼츠만 뇌 이론 (highway)',            c:'시뮬레이터',    s:'HIGHWAY', i:'🧠'},
+      {n:'석굴암 시뮬레이터',  u:'https://luxzbi.github.io/accs',     d:'석굴암 시뮬레이터 (highway)',          c:'시뮬레이터',    s:'HIGHWAY', i:'🗿'},
+      {n:'HIGHWAY',            u:'https://link109.xyz',                d:'메인 링크허브 (highway)',             c:'Quasarway',     s:'HIGHWAY', i:'🛣️', haktuksa:true},
+      {n:'Quasarway',          u:'https://link109.xyz/quasarway.html', d:'Quasarway 전체 링크 (highway)',       c:'Quasarway',     s:'HIGHWAY', i:'🚀', haktuksa:true},
+      {n:'Secret Garden',      u:'https://plax-eta.vercel.app',        d:'비밀 게시판 (highway)',                c:'Quasarway',     s:'HIGHWAY', i:'🌿', haktuksa:true},
+      {n:'Gateway',            u:'https://link109.xyz/gateway',        d:'종합 링크 허브 (highway)',             c:'Quasarway',     s:'HIGHWAY', i:'🌐', haktuksa:true},
+      {n:'Milestone',          u:'https://link109.xyz/milestone',      d:'통합 검색 엔진 (highway)',             c:'Quasarway',     s:'HIGHWAY', i:'🔭', haktuksa:true},
+      {n:'Timeway',            u:'/gateway/timeway.html',               d:'1-9 시간표 (highway)',                c:'Quasarway',     s:'HIGHWAY', i:'🗓️', haktuksa:true},
+      {n:'주식게임-CCX v1',   u:'https://ztec.kr',                    d:'학특사 주식게임 (highway)',           c:'Quasarway',     s:'HIGHWAY', i:'📈', haktuksa:true},
+      {n:'CIP 시간표',         u:'https://luxzbi.github.io/CIP/',      d:'학특사 시간표 (highway)',             c:'Quasarway',     s:'HIGHWAY', i:'📋', haktuksa:true},
+      {n:'자습 타이머',        u:'https://luxzbi.github.io/time/',     d:'학특사 타이머 도구 (highway)',        c:'Quasarway',     s:'HIGHWAY', i:'⏱️', haktuksa:true},
+      {n:'bytenode',           u:'https://bytenode109.vercel.app',     d:'블로그 & AI 시험지 (highway)',         c:'Quasarway',     s:'HIGHWAY', i:'📝', haktuksa:true},
+      {n:'byteexam',           u:'https://byteexam109.vercel.app',     d:'AI 시험지 플랫폼 (highway)',           c:'Quasarway',     s:'HIGHWAY', i:'📋', haktuksa:true},
+      {n:'과학 질의응답',      u:'https://url.kr/vjfvv3',              d:'수행평가 질의응답 (highway)',           c:'수행평가',      s:'HIGHWAY', i:'🔬'},
+      // ── GATEWAY: AI 어시스턴트 ──
+      {n:'ChatGPT',            u:'https://chatgpt.com',                d:'OpenAI',                     c:'AI 어시스턴트', s:'GATEWAY', i:'💬'},
+      {n:'Claude',             u:'https://claude.ai',                  d:'Anthropic AI',               c:'AI 어시스턴트', s:'GATEWAY', i:'🤖'},
+      {n:'Gemini',             u:'https://gemini.google.com',          d:'Google AI',                  c:'AI 어시스턴트', s:'GATEWAY', i:'✨'},
+      {n:'Copilot',            u:'https://copilot.microsoft.com',      d:'Microsoft AI',               c:'AI 어시스턴트', s:'GATEWAY', i:'🪟'},
+      {n:'Perplexity',         u:'https://www.perplexity.ai',          d:'AI 검색',                    c:'AI 어시스턴트', s:'GATEWAY', i:'🔎'},
+      {n:'DeepSeek',           u:'https://deepseek.com',               d:'DeepSeek AI',                c:'AI 어시스턴트', s:'GATEWAY', i:'🐋'},
+      {n:'Grok',               u:'https://grok.com',                   d:'xAI',                        c:'AI 어시스턴트', s:'GATEWAY', i:'⚡'},
+      {n:'NotebookLM',         u:'https://notebooklm.google.com',      d:'Google NotebookLM',          c:'AI 어시스턴트', s:'GATEWAY', i:'📓'},
+      {n:'Poe',                u:'https://poe.com',                    d:'멀티 AI 플랫폼',             c:'AI 어시스턴트', s:'GATEWAY', i:'🌀'},
+      {n:'Phind',              u:'https://www.phind.com',              d:'개발자용 AI 검색',           c:'AI 어시스턴트', s:'GATEWAY', i:'💡'},
+      {n:'Consensus',          u:'https://consensus.app',              d:'논문 기반 AI',               c:'AI 어시스턴트', s:'GATEWAY', i:'📊'},
+      {n:'ChatPDF',            u:'https://www.chatpdf.com',            d:'PDF 대화 AI',                c:'AI 어시스턴트', s:'GATEWAY', i:'📄'},
+      // ── AI 이미지·영상 ──
+      {n:'Midjourney',         u:'https://www.midjourney.com',         d:'이미지 생성 AI',             c:'AI 이미지·영상', s:'GATEWAY', i:'🎨'},
+      {n:'Runway',             u:'https://runwayml.com',               d:'영상 생성 AI',               c:'AI 이미지·영상', s:'GATEWAY', i:'🎬'},
+      {n:'Pika',               u:'https://pika.art',                   d:'AI 영상 생성',               c:'AI 이미지·영상', s:'GATEWAY', i:'🎥'},
+      {n:'Luma AI',            u:'https://lumalabs.ai',                d:'3D·영상 AI',                 c:'AI 이미지·영상', s:'GATEWAY', i:'🌌'},
+      {n:'Leonardo AI',        u:'https://leonardo.ai',                d:'AI 이미지 생성',             c:'AI 이미지·영상', s:'GATEWAY', i:'🖼️'},
+      {n:'Ideogram',           u:'https://ideogram.ai',                d:'텍스트 포함 이미지',         c:'AI 이미지·영상', s:'GATEWAY', i:'🔤'},
+      {n:'Clipdrop',           u:'https://clipdrop.co',                d:'AI 이미지 편집',             c:'AI 이미지·영상', s:'GATEWAY', i:'✂️'},
+      {n:'Krea',               u:'https://www.krea.ai',                d:'실시간 AI 생성',             c:'AI 이미지·영상', s:'GATEWAY', i:'🌈'},
+      {n:'Playground AI',      u:'https://playground.com',             d:'무료 이미지 생성',           c:'AI 이미지·영상', s:'GATEWAY', i:'🎠'},
+      // ── AI 음성·음악 ──
+      {n:'Suno',               u:'https://suno.com',                   d:'AI 음악 생성',               c:'AI 음성·음악',  s:'GATEWAY', i:'🎵'},
+      {n:'ElevenLabs',         u:'https://elevenlabs.io',              d:'AI 음성 합성',               c:'AI 음성·음악',  s:'GATEWAY', i:'🎙️'},
+      {n:'Udio',               u:'https://www.udio.com',               d:'AI 음악 생성',               c:'AI 음성·음악',  s:'GATEWAY', i:'🎶'},
+      {n:'Murf AI',            u:'https://murf.ai',                    d:'AI 내레이션',                c:'AI 음성·음악',  s:'GATEWAY', i:'🎤'},
+      {n:'PlayHT',             u:'https://play.ht',                    d:'AI TTS',                     c:'AI 음성·음악',  s:'GATEWAY', i:'▶️'},
+      {n:'타입캐스트',         u:'https://typecast.ai',                d:'한국어 AI 성우',              c:'AI 음성·음악',  s:'GATEWAY', i:'🔊'},
+      {n:'Soundraw',           u:'https://soundraw.io',                d:'AI 배경음악',                c:'AI 음성·음악',  s:'GATEWAY', i:'🎸'},
+      {n:'AIVA',               u:'https://www.aiva.ai',                d:'AI 작곡',                    c:'AI 음성·음악',  s:'GATEWAY', i:'🎹'},
+      // ── CodingAI ──
+      {n:'Cursor',             u:'https://cursor.com',                 d:'AI 코드 에디터',             c:'CodingAI',      s:'GATEWAY', i:'🖱️'},
+      {n:'v0',                 u:'https://v0.dev',                     d:'Vercel AI UI 생성',          c:'CodingAI',      s:'GATEWAY', i:'🔷'},
+      {n:'Bolt',               u:'https://bolt.new',                   d:'AI 앱 빌더',                 c:'CodingAI',      s:'GATEWAY', i:'⚡'},
+      {n:'Lovable',            u:'https://lovable.dev',                d:'AI 웹앱 생성',               c:'CodingAI',      s:'GATEWAY', i:'💖'},
+      {n:'Windsurf',           u:'https://windsurf.com',               d:'AI IDE',                     c:'CodingAI',      s:'GATEWAY', i:'🏄'},
+      {n:'Codex',              u:'https://openai.com/ko-KR/codex',     d:'OpenAI Codex',               c:'CodingAI',      s:'GATEWAY', i:'🧠'},
+      {n:'Manus',              u:'https://manus.im',                   d:'AI 에이전트',                c:'CodingAI',      s:'GATEWAY', i:'🦾'},
+      {n:'Kiro',               u:'https://kiro.dev',                   d:'AI 개발 도구',               c:'CodingAI',      s:'GATEWAY', i:'⚙️'},
+      // ── 코드·개발 도구 ──
+      {n:'GitHub',             u:'https://github.com',                 d:'코드 저장소',                c:'코드·개발도구', s:'GATEWAY', i:'🐙'},
+      {n:'VS Code',            u:'https://code.visualstudio.com',      d:'코드 에디터',                c:'코드·개발도구', s:'GATEWAY', i:'🔵'},
+      {n:'Stack Overflow',     u:'https://stackoverflow.com',          d:'개발자 Q&A',                 c:'코드·개발도구', s:'GATEWAY', i:'❓'},
+      {n:'MDN Web Docs',       u:'https://developer.mozilla.org',      d:'웹 개발 교과서',             c:'코드·개발도구', s:'GATEWAY', i:'📖'},
+      {n:'NPM',                u:'https://www.npmjs.com',              d:'JS 패키지',                  c:'코드·개발도구', s:'GATEWAY', i:'📦'},
+      {n:'Firebase',           u:'https://firebase.google.com',        d:'Google 백엔드',              c:'코드·개발도구', s:'GATEWAY', i:'🔥'},
+      {n:'Vercel',             u:'https://vercel.com',                 d:'프론트엔드 배포',            c:'코드·개발도구', s:'GATEWAY', i:'▲'},
+      {n:'Netlify',            u:'https://www.netlify.com',            d:'정적 사이트 배포',           c:'코드·개발도구', s:'GATEWAY', i:'🟩'},
+      {n:'Supabase',           u:'https://supabase.com',               d:'오픈소스 DB',                c:'코드·개발도구', s:'GATEWAY', i:'🟢'},
+      {n:'Replit',             u:'https://replit.com',                 d:'온라인 IDE',                 c:'코드·개발도구', s:'GATEWAY', i:'💻'},
+      {n:'CodePen',            u:'https://codepen.io',                 d:'HTML/CSS/JS 테스트',         c:'코드·개발도구', s:'GATEWAY', i:'🖊️'},
+      {n:'Android Studio',     u:'https://developer.android.com/studio',d:'안드로이드 개발',           c:'코드·개발도구', s:'GATEWAY', i:'🤖'},
+      {n:'Visual Studio',      u:'https://visualstudio.microsoft.com', d:'Microsoft IDE',              c:'코드·개발도구', s:'GATEWAY', i:'🟣'},
+      // ── 코딩 학습 ──
+      {n:'LeetCode',           u:'https://leetcode.com',               d:'알고리즘 문제',              c:'코딩학습',      s:'GATEWAY', i:'🏆'},
+      {n:'freeCodeCamp',       u:'https://www.freecodecamp.org',       d:'무료 웹 개발',               c:'코딩학습',      s:'GATEWAY', i:'🔥'},
+      {n:'Codecademy',         u:'https://www.codecademy.com',         d:'인터랙티브 코딩',           c:'코딩학습',      s:'GATEWAY', i:'🎓'},
+      {n:'W3Schools',          u:'https://www.w3schools.com',          d:'HTML/CSS/JS 레퍼런스',       c:'코딩학습',      s:'GATEWAY', i:'🌐'},
+      {n:'HackerRank',         u:'https://www.hackerrank.com',         d:'코딩 테스트',                c:'코딩학습',      s:'GATEWAY', i:'💼'},
+      {n:'Codewars',           u:'https://www.codewars.com',           d:'코딩 챌린지',                c:'코딩학습',      s:'GATEWAY', i:'⚔️'},
+      {n:'JavaScript.info',    u:'https://javascript.info',            d:'JS 완벽 가이드',             c:'코딩학습',      s:'GATEWAY', i:'📘'},
+      {n:'React 공식 문서',    u:'https://react.dev',                  d:'리액트 학습',                c:'코딩학습',      s:'GATEWAY', i:'⚛️'},
+      {n:'인프런',             u:'https://www.inflearn.com',           d:'개발 강의',                  c:'코딩학습',      s:'GATEWAY', i:'📗'},
+      {n:'노마드코더',         u:'https://nomadcoders.co',             d:'클론 코딩 강의',             c:'코딩학습',      s:'GATEWAY', i:'🧳'},
+      {n:'생활코딩',           u:'https://opentutorials.org',          d:'웹 개발 입문',               c:'코딩학습',      s:'GATEWAY', i:'🌱'},
+      // ── 데이터·AI 실험 ──
+      {n:'Google Colab',       u:'https://colab.research.google.com',  d:'클라우드 Jupyter',           c:'데이터·AI',     s:'GATEWAY', i:'🔬'},
+      {n:'Hugging Face',       u:'https://huggingface.co',             d:'AI 모델 허브',               c:'데이터·AI',     s:'GATEWAY', i:'🤗'},
+      {n:'Kaggle',             u:'https://www.kaggle.com',             d:'데이터 분석·ML',             c:'데이터·AI',     s:'GATEWAY', i:'📊'},
+      {n:'Jupyter',            u:'https://jupyter.org',                d:'대화형 노트북',              c:'데이터·AI',     s:'GATEWAY', i:'📓'},
+      {n:'Papers with Code',   u:'https://paperswithcode.com',         d:'논문+코드',                  c:'데이터·AI',     s:'GATEWAY', i:'📄'},
+      {n:'Teachable Machine',  u:'https://teachablemachine.withgoogle.com',d:'노코드 ML',              c:'데이터·AI',     s:'GATEWAY', i:'🤖'},
+      {n:'Replicate',          u:'https://replicate.com',              d:'AI 모델 API',                c:'데이터·AI',     s:'GATEWAY', i:'🔁'},
+      {n:'Flourish',           u:'https://flourish.studio',            d:'인터랙티브 차트',            c:'데이터·AI',     s:'GATEWAY', i:'🌸'},
+      // ── PPT·발표 ──
+      {n:'Canva',              u:'https://www.canva.com',              d:'디자인 툴',                  c:'PPT·발표',      s:'GATEWAY', i:'🎨'},
+      {n:'구글 프레젠테이션',  u:'https://slides.google.com',          d:'협업 PPT',                   c:'PPT·발표',      s:'GATEWAY', i:'📊'},
+      {n:'Prezi',              u:'https://prezi.com',                  d:'동적 프레젠테이션',          c:'PPT·발표',      s:'GATEWAY', i:'🌐'},
+      {n:'Gamma',              u:'https://gamma.app',                  d:'AI 프레젠테이션',            c:'PPT·발표',      s:'GATEWAY', i:'🌀'},
+      {n:'MiriCanvas',         u:'https://www.miricanvas.com/ko',      d:'미리캔버스',                 c:'PPT·발표',      s:'GATEWAY', i:'🎀'},
+      {n:'망고보드',           u:'https://www.mangoboard.net',         d:'한국형 디자인 툴',           c:'PPT·발표',      s:'GATEWAY', i:'🥭'},
+      {n:'Slidesgo',           u:'https://slidesgo.com',               d:'무료 PPT 템플릿',            c:'PPT·발표',      s:'GATEWAY', i:'🎁'},
+      {n:'Beautiful.ai',       u:'https://www.beautiful.ai',           d:'AI PPT 자동 정렬',           c:'PPT·발표',      s:'GATEWAY', i:'💎'},
+      {n:'Pitch',              u:'https://pitch.com',                  d:'협업 발표 툴',               c:'PPT·발표',      s:'GATEWAY', i:'🎯'},
+      {n:'Tome',               u:'https://tome.app',                   d:'AI 스토리텔링',              c:'PPT·발표',      s:'GATEWAY', i:'📖'},
+      {n:'Piktochart',         u:'https://piktochart.com',             d:'인포그래픽',                 c:'PPT·발표',      s:'GATEWAY', i:'📉'},
+      {n:'구글 설문지',        u:'https://forms.google.com',           d:'설문·퀴즈 제작',             c:'PPT·발표',      s:'GATEWAY', i:'📋'},
+      // ── 디자인·에셋 ──
+      {n:'Figma',              u:'https://www.figma.com',              d:'UI/UX 협업 툴',              c:'디자인·에셋',   s:'GATEWAY', i:'🖌️'},
+      {n:'Adobe Express',      u:'https://www.adobe.com/express',      d:'간편 디자인',                c:'디자인·에셋',   s:'GATEWAY', i:'🔴'},
+      {n:'Unsplash',           u:'https://unsplash.com',               d:'무료 고화질 사진',           c:'디자인·에셋',   s:'GATEWAY', i:'📷'},
+      {n:'Pexels',             u:'https://www.pexels.com',             d:'무료 사진·영상',             c:'디자인·에셋',   s:'GATEWAY', i:'🖼️'},
+      {n:'Dribbble',           u:'https://dribbble.com',               d:'디자인 포트폴리오',          c:'디자인·에셋',   s:'GATEWAY', i:'🏀'},
+      {n:'Behance',            u:'https://www.behance.net',            d:'크리에이티브 갤러리',        c:'디자인·에셋',   s:'GATEWAY', i:'🎭'},
+      {n:'Google Fonts',       u:'https://fonts.google.com',           d:'무료 폰트',                  c:'디자인·에셋',   s:'GATEWAY', i:'🔤'},
+      {n:'Pixabay',            u:'https://pixabay.com',                d:'무료 미디어',                c:'디자인·에셋',   s:'GATEWAY', i:'🎞️'},
+      {n:'Flaticon',           u:'https://www.flaticon.com',           d:'무료 아이콘',                c:'디자인·에셋',   s:'GATEWAY', i:'🔣'},
+      {n:'Icons8',             u:'https://icons8.com',                 d:'아이콘·일러스트',            c:'디자인·에셋',   s:'GATEWAY', i:'🎨'},
+      {n:'눈누',               u:'https://noonnu.cc',                  d:'무료 한글 폰트',             c:'디자인·에셋',   s:'GATEWAY', i:'🗛'},
+      {n:'Color Hunt',         u:'https://colorhunt.co',               d:'컬러 팔레트',                c:'디자인·에셋',   s:'GATEWAY', i:'🎨'},
+      {n:'Coolors',            u:'https://coolors.co',                 d:'색상 조합 생성',             c:'디자인·에셋',   s:'GATEWAY', i:'🌈'},
+      // ── 사진·영상 편집 ──
+      {n:'Adobe Photoshop',    u:'https://www.adobe.com/products/photoshop.html',     d:'이미지 편집',     c:'사진·영상편집', s:'GATEWAY', i:'🖼️'},
+      {n:'Adobe Premiere Pro', u:'https://www.adobe.com/products/premiere.html',      d:'전문 영상 편집',  c:'사진·영상편집', s:'GATEWAY', i:'🔴'},
+      {n:'Adobe After Effects',u:'https://www.adobe.com/products/aftereffects.html',  d:'모션 그래픽·VFX', c:'사진·영상편집', s:'GATEWAY', i:'✨'},
+      {n:'Adobe Lightroom',    u:'https://www.adobe.com/products/photoshop-lightroom.html',d:'사진 보정',  c:'사진·영상편집', s:'GATEWAY', i:'📷'},
+      {n:'Adobe Illustrator',  u:'https://www.adobe.com/products/illustrator.html',   d:'벡터 그래픽',     c:'사진·영상편집', s:'GATEWAY', i:'🖊️'},
+      {n:'Adobe Audition',     u:'https://www.adobe.com/products/audition.html',      d:'오디오 편집',     c:'사진·영상편집', s:'GATEWAY', i:'🎙️'},
+      {n:'DaVinci Resolve',    u:'https://www.blackmagicdesign.com/products/davinciresolve',d:'영상·색보정',c:'사진·영상편집', s:'GATEWAY', i:'🎬'},
+      {n:'CapCut',             u:'https://www.capcut.com',             d:'영상 편집',                  c:'사진·영상편집', s:'GATEWAY', i:'✂️'},
+      {n:'Photopea',           u:'https://www.photopea.com',           d:'웹 무료 포토샵',             c:'사진·영상편집', s:'GATEWAY', i:'🖼️'},
+      {n:'Remove.bg',          u:'https://www.remove.bg',              d:'배경 제거',                  c:'사진·영상편집', s:'GATEWAY', i:'🪄'},
+      {n:'VEED',               u:'https://www.veed.io',                d:'온라인 영상 편집',           c:'사진·영상편집', s:'GATEWAY', i:'🎬'},
+      {n:'Pixlr',              u:'https://pixlr.com',                  d:'온라인 사진 편집',           c:'사진·영상편집', s:'GATEWAY', i:'✏️'},
+      // ── 3D·메이커 ──
+      {n:'Unreal Engine',      u:'https://www.unrealengine.com',       d:'고퀄리티 3D',                c:'3D·메이커',     s:'GATEWAY', i:'🎮'},
+      {n:'Unity',              u:'https://unity.com',                  d:'게임·시뮬레이션',            c:'3D·메이커',     s:'GATEWAY', i:'🕹️'},
+      {n:'Blender',            u:'https://www.blender.org',            d:'3D 오픈소스',                c:'3D·메이커',     s:'GATEWAY', i:'🫐'},
+      {n:'Tinkercad',          u:'https://www.tinkercad.com',          d:'3D 모델링·아두이노',         c:'3D·메이커',     s:'GATEWAY', i:'🧱'},
+      {n:'SketchUp',           u:'https://www.sketchup.com',           d:'건축·인테리어 3D',           c:'3D·메이커',     s:'GATEWAY', i:'🏗️'},
+      {n:'Fusion 360',         u:'https://www.autodesk.com/products/fusion-360',d:'3D CAD/CAM',         c:'3D·메이커',     s:'GATEWAY', i:'⚙️'},
+      {n:'Spline',             u:'https://spline.design',              d:'웹 3D 디자인',               c:'3D·메이커',     s:'GATEWAY', i:'🌐'},
+      {n:'Sketchfab',          u:'https://sketchfab.com',              d:'3D 모델 공유',               c:'3D·메이커',     s:'GATEWAY', i:'🗿'},
+      // ── 게임·인터랙티브 ──
+      {n:'Roblox Studio',      u:'https://create.roblox.com',          d:'로블록스 게임 제작',         c:'게임·인터랙티브',s:'GATEWAY', i:'🟥'},
+      {n:'Scratch',            u:'https://scratch.mit.edu',            d:'MIT 블록 코딩',              c:'게임·인터랙티브',s:'GATEWAY', i:'🐱'},
+      {n:'Godot',              u:'https://godotengine.org',            d:'무료 게임 엔진',             c:'게임·인터랙티브',s:'GATEWAY', i:'🤖'},
+      {n:'GDevelop',           u:'https://gdevelop.io',                d:'노코드 게임 제작',           c:'게임·인터랙티브',s:'GATEWAY', i:'🎲'},
+      {n:'MakeCode',           u:'https://makecode.microbit.org',      d:'마이크로비트 코딩',          c:'게임·인터랙티브',s:'GATEWAY', i:'💻'},
+      // ── 수학·과학 ──
+      {n:'WolframAlpha',       u:'https://www.wolframalpha.com',       d:'수학 연산 엔진',             c:'수학·과학',     s:'GATEWAY', i:'🧮'},
+      {n:'Desmos',             u:'https://www.desmos.com',             d:'그래핑 계산기',              c:'수학·과학',     s:'GATEWAY', i:'📈'},
+      {n:'GeoGebra',           u:'https://www.geogebra.org',           d:'수학·물리 시각화',           c:'수학·과학',     s:'GATEWAY', i:'📐'},
+      {n:'Symbolab',           u:'https://www.symbolab.com',           d:'수학 풀이',                  c:'수학·과학',     s:'GATEWAY', i:'➗'},
+      {n:'콴다',               u:'https://qanda.ai',                   d:'수학 촬영 풀이',             c:'수학·과학',     s:'GATEWAY', i:'📸'},
+      {n:'PhET',               u:'https://phet.colorado.edu',          d:'물리·화학 시뮬',             c:'수학·과학',     s:'GATEWAY', i:'⚗️'},
+      {n:'Brilliant',          u:'https://brilliant.org',              d:'수학·과학 학습',             c:'수학·과학',     s:'GATEWAY', i:'💡'},
+      {n:'족보닷컴',           u:'https://www.zocbo.com',              d:'학교 기출문제',              c:'수학·과학',     s:'GATEWAY', i:'📝'},
+      {n:'평가원 기출',        u:'https://www.kice.re.kr',             d:'수능 기출문제',              c:'수학·과학',     s:'GATEWAY', i:'📋'},
+      // ── 교육 콘텐츠 ──
+      {n:'Khan Academy',       u:'https://ko.khanacademy.org',         d:'무료 개념 강의',             c:'교육콘텐츠',    s:'GATEWAY', i:'🏫'},
+      {n:'Coursera',           u:'https://www.coursera.org',           d:'대학 강의 온라인',           c:'교육콘텐츠',    s:'GATEWAY', i:'🎓'},
+      {n:'edX',                u:'https://www.edx.org',                d:'MIT·하버드 강의',            c:'교육콘텐츠',    s:'GATEWAY', i:'📘'},
+      {n:'Udemy',              u:'https://www.udemy.com',              d:'실무 강의',                  c:'교육콘텐츠',    s:'GATEWAY', i:'📗'},
+      {n:'TED-Ed',             u:'https://ed.ted.com',                 d:'교육 영상',                  c:'교육콘텐츠',    s:'GATEWAY', i:'🎤'},
+      {n:'MIT OpenCourseWare', u:'https://ocw.mit.edu',                d:'MIT 무료 강의',              c:'교육콘텐츠',    s:'GATEWAY', i:'🏛️'},
+      // ── 한국 인강 ──
+      {n:'EBSi',               u:'https://www.ebsi.co.kr',             d:'수능·내신 인강',             c:'한국인강',      s:'GATEWAY', i:'📺'},
+      {n:'메가스터디',         u:'https://www.megastudy.net',          d:'수능 전문 인강',             c:'한국인강',      s:'GATEWAY', i:'⭐'},
+      {n:'이투스',             u:'https://www.etoos.com',              d:'수능 인강',                  c:'한국인강',      s:'GATEWAY', i:'📡'},
+      {n:'대성마이맥',         u:'https://www.mimacstudy.com',         d:'수능 인강',                  c:'한국인강',      s:'GATEWAY', i:'🎯'},
+      {n:'강남구청 수능방송',  u:'https://edu.ingang.go.kr',           d:'무료 수능 강의',             c:'한국인강',      s:'GATEWAY', i:'🏛️'},
+      {n:'K-MOOC',             u:'https://www.kmooc.kr',               d:'대학 전공 무료',             c:'한국인강',      s:'GATEWAY', i:'🎓'},
+      // ── 퀴즈·수업 참여 ──
+      {n:'Kahoot',             u:'https://kahoot.com',                 d:'퀴즈 게임',                  c:'퀴즈·수업',     s:'GATEWAY', i:'🎉'},
+      {n:'Quizlet',            u:'https://quizlet.com',                d:'플래시카드 학습',            c:'퀴즈·수업',     s:'GATEWAY', i:'🃏'},
+      {n:'Quizizz',            u:'https://quizizz.com',                d:'퀴즈 플랫폼',                c:'퀴즈·수업',     s:'GATEWAY', i:'❓'},
+      {n:'Padlet',             u:'https://padlet.com',                 d:'온라인 게시판',              c:'퀴즈·수업',     s:'GATEWAY', i:'📌'},
+      {n:'Mentimeter',         u:'https://www.mentimeter.com',         d:'실시간 투표·퀴즈',           c:'퀴즈·수업',     s:'GATEWAY', i:'📊'},
+      {n:'Blooket',            u:'https://www.blooket.com',            d:'게임형 퀴즈',                c:'퀴즈·수업',     s:'GATEWAY', i:'📦'},
+      {n:'클래스카드',         u:'https://www.classcard.net',          d:'단어·암기 카드',             c:'퀴즈·수업',     s:'GATEWAY', i:'🗂️'},
+      // ── 논문·리서치 ──
+      {n:'Google Scholar',     u:'https://scholar.google.com',         d:'학술 논문 검색',             c:'논문·리서치',   s:'GATEWAY', i:'🎓'},
+      {n:'arXiv',              u:'https://arxiv.org',                  d:'최신 논문 무료',             c:'논문·리서치',   s:'GATEWAY', i:'🔬'},
+      {n:'Zotero',             u:'https://www.zotero.org',             d:'참고문헌 관리',              c:'논문·리서치',   s:'GATEWAY', i:'🗂️'},
+      {n:'RISS',               u:'https://www.riss.kr',                d:'국내 학위 논문',             c:'논문·리서치',   s:'GATEWAY', i:'📚'},
+      {n:'DBpia',              u:'https://www.dbpia.co.kr',            d:'한국 학술 저널',             c:'논문·리서치',   s:'GATEWAY', i:'📰'},
+      {n:'Semantic Scholar',   u:'https://www.semanticscholar.org',    d:'AI 논문 검색',               c:'논문·리서치',   s:'GATEWAY', i:'🧠'},
+      {n:'Connected Papers',   u:'https://www.connectedpapers.com',    d:'논문 연관 시각화',           c:'논문·리서치',   s:'GATEWAY', i:'🕸️'},
+      // ── 자료 조사 ──
+      {n:'네이버 뉴스',        u:'https://news.naver.com',             d:'뉴스 검색',                  c:'자료조사',      s:'GATEWAY', i:'📰'},
+      {n:'네이버 지식백과',    u:'https://terms.naver.com',            d:'백과사전',                   c:'자료조사',      s:'GATEWAY', i:'📖'},
+      {n:'KOSIS',              u:'https://kosis.kr',                   d:'국가통계포털',               c:'자료조사',      s:'GATEWAY', i:'📊'},
+      {n:'공공데이터포털',     u:'https://www.data.go.kr',             d:'정부 공공 데이터',           c:'자료조사',      s:'GATEWAY', i:'🗃️'},
+      {n:'표준국어대사전',     u:'https://stdict.korean.go.kr',        d:'국립국어원',                 c:'자료조사',      s:'GATEWAY', i:'🔤'},
+      {n:'국립중앙도서관',     u:'https://www.nl.go.kr',               d:'디지털 컬렉션',              c:'자료조사',      s:'GATEWAY', i:'📚'},
+      {n:'한국사데이터베이스', u:'https://db.history.go.kr',           d:'국사편찬위원회',             c:'자료조사',      s:'GATEWAY', i:'🏯'},
+      // ── 메모·정리 ──
+      {n:'Notion',             u:'https://www.notion.so',              d:'올인원 워크스페이스',        c:'메모·정리',     s:'GATEWAY', i:'📝'},
+      {n:'Google Keep',        u:'https://keep.google.com',            d:'빠른 메모',                  c:'메모·정리',     s:'GATEWAY', i:'💛'},
+      {n:'OneNote',            u:'https://www.onenote.com',            d:'MS 노트 앱',                 c:'메모·정리',     s:'GATEWAY', i:'🟣'},
+      {n:'Evernote',           u:'https://evernote.com',               d:'노트 관리',                  c:'메모·정리',     s:'GATEWAY', i:'🐘'},
+      {n:'Anki',               u:'https://apps.ankiweb.net',           d:'망각곡선 암기',              c:'메모·정리',     s:'GATEWAY', i:'🃏'},
+      {n:'Obsidian',           u:'https://obsidian.md',                d:'마크다운 지식 베이스',       c:'메모·정리',     s:'GATEWAY', i:'💎'},
+      {n:'네이버 MYBOX',       u:'https://mybox.naver.com',            d:'클라우드 저장소',            c:'메모·정리',     s:'GATEWAY', i:'📦'},
+      // ── 문서·글쓰기 ──
+      {n:'Google Docs',        u:'https://docs.google.com',            d:'실시간 문서 협업',           c:'문서·글쓰기',   s:'GATEWAY', i:'📝'},
+      {n:'Google Sheets',      u:'https://sheets.google.com',          d:'스프레드시트',               c:'문서·글쓰기',   s:'GATEWAY', i:'📊'},
+      {n:'Grammarly',          u:'https://www.grammarly.com',          d:'영어 문법 교정',             c:'문서·글쓰기',   s:'GATEWAY', i:'✅'},
+      {n:'QuillBot',           u:'https://quillbot.com',               d:'패러프레이징',               c:'문서·글쓰기',   s:'GATEWAY', i:'🦜'},
+      {n:'Smallpdf',           u:'https://www.smallpdf.com',           d:'PDF 변환·편집',              c:'문서·글쓰기',   s:'GATEWAY', i:'📄'},
+      {n:'ILovePDF',           u:'https://www.ilovepdf.com',           d:'PDF 병합·압축',              c:'문서·글쓰기',   s:'GATEWAY', i:'❤️'},
+      {n:'DeepL Write',        u:'https://www.deepl.com/write',        d:'AI 글쓰기',                  c:'문서·글쓰기',   s:'GATEWAY', i:'✍️'},
+      {n:'한컴독스',           u:'https://www.hancomdocs.com',         d:'한글 온라인',                c:'문서·글쓰기',   s:'GATEWAY', i:'🇰🇷'},
+      // ── 독서 ──
+      {n:'교보문고',           u:'https://www.kyobobook.co.kr',        d:'도서·전자책',                c:'독서',          s:'GATEWAY', i:'📘'},
+      {n:'YES24',              u:'https://www.yes24.com',              d:'도서 구매',                  c:'독서',          s:'GATEWAY', i:'📚'},
+      {n:'알라딘',             u:'https://www.aladin.co.kr',           d:'도서·중고책',                c:'독서',          s:'GATEWAY', i:'📗'},
+      {n:'밀리의 서재',        u:'https://www.millie.co.kr',           d:'전자책 구독',                c:'독서',          s:'GATEWAY', i:'📱'},
+      {n:'Medium',             u:'https://medium.com',                 d:'영어 아티클',                c:'독서',          s:'GATEWAY', i:'📰'},
+      // ── 영어·어학 ──
+      {n:'Duolingo',           u:'https://www.duolingo.com',           d:'언어 학습 앱',               c:'영어·어학',     s:'GATEWAY', i:'🦜'},
+      {n:'DeepL',              u:'https://www.deepl.com',              d:'고품질 번역',                c:'영어·어학',     s:'GATEWAY', i:'🔵'},
+      {n:'파파고',             u:'https://papago.naver.com',           d:'네이버 번역',                c:'영어·어학',     s:'GATEWAY', i:'🌐'},
+      {n:'네이버 영어사전',    u:'https://en.dict.naver.com',          d:'영한·한영 사전',             c:'영어·어학',     s:'GATEWAY', i:'📖'},
+      {n:'말해보카',           u:'https://www.malhaeboca.com',         d:'영단어 학습',                c:'영어·어학',     s:'GATEWAY', i:'💬'},
+      // ── 웹 유틸리티 ──
+      {n:'Loom',               u:'https://www.loom.com',               d:'화면 녹화 공유',             c:'웹유틸리티',    s:'GATEWAY', i:'🎥'},
+      {n:'WeTransfer',         u:'https://wetransfer.com',             d:'대용량 파일 전송',           c:'웹유틸리티',    s:'GATEWAY', i:'📤'},
+      {n:'Draw.io',            u:'https://app.diagrams.net',           d:'순서도·다이어그램',          c:'웹유틸리티',    s:'GATEWAY', i:'📊'},
+      {n:'Convertio',          u:'https://convertio.co',               d:'파일 형식 변환',             c:'웹유틸리티',    s:'GATEWAY', i:'🔄'},
+      {n:'Excalidraw',         u:'https://excalidraw.com',             d:'손그림 화이트보드',          c:'웹유틸리티',    s:'GATEWAY', i:'✏️'},
+      {n:'QR Code Monkey',     u:'https://www.qrcode-monkey.com',      d:'QR코드 생성',                c:'웹유틸리티',    s:'GATEWAY', i:'📱'},
+      {n:'Carbon',             u:'https://carbon.now.sh',              d:'코드 이미지 생성',           c:'웹유틸리티',    s:'GATEWAY', i:'🖼️'},
+      // ── 협업·화이트보드 ──
+      {n:'Discord',            u:'https://discord.com',                d:'커뮤니티·음성',              c:'협업·화이트보드',s:'GATEWAY', i:'🎮'},
+      {n:'Zoom',               u:'https://zoom.us',                    d:'화상 회의',                  c:'협업·화이트보드',s:'GATEWAY', i:'📹'},
+      {n:'Google Meet',        u:'https://meet.google.com',            d:'구글 화상 회의',             c:'협업·화이트보드',s:'GATEWAY', i:'📹'},
+      {n:'Slack',              u:'https://slack.com',                  d:'팀 메신저',                  c:'협업·화이트보드',s:'GATEWAY', i:'💬'},
+      {n:'Miro',               u:'https://miro.com',                   d:'온라인 화이트보드',          c:'협업·화이트보드',s:'GATEWAY', i:'🗒️'},
+      {n:'Trello',             u:'https://trello.com',                 d:'칸반 보드',                  c:'협업·화이트보드',s:'GATEWAY', i:'📌'},
+      {n:'FigJam',             u:'https://www.figma.com/figjam',       d:'Figma 화이트보드',           c:'협업·화이트보드',s:'GATEWAY', i:'🎨'},
+      // ── 알고리즘·개발 커뮤니티 ──
+      {n:'백준 (BOJ)',          u:'https://www.acmicpc.net',            d:'알고리즘 문제풀이',          c:'알고리즘·커뮤니티',s:'GATEWAY',i:'🏆'},
+      {n:'프로그래머스',       u:'https://programmers.co.kr',          d:'코딩 테스트 연습',           c:'알고리즘·커뮤니티',s:'GATEWAY',i:'💼'},
+      {n:'Codeforces',         u:'https://codeforces.com',             d:'해외 알고리즘',              c:'알고리즘·커뮤니티',s:'GATEWAY',i:'🌍'},
+      {n:'GitHub Trending',    u:'https://github.com/trending',        d:'핫한 오픈소스',              c:'알고리즘·커뮤니티',s:'GATEWAY',i:'🔥'},
+      {n:'Hacker News',        u:'https://news.ycombinator.com',       d:'실리콘밸리 테크',            c:'알고리즘·커뮤니티',s:'GATEWAY',i:'🗞️'},
+      {n:'Velog',              u:'https://velog.io',                   d:'개발 기술 블로그',           c:'알고리즘·커뮤니티',s:'GATEWAY',i:'✍️'},
+      // ── 학생 커뮤니티 ──
+      {n:'에브리타임',         u:'https://everytime.kr',               d:'대학생 커뮤니티',            c:'학생커뮤니티',  s:'GATEWAY', i:'🎓'},
+      {n:'오르비',             u:'https://orbi.kr',                    d:'수험생 커뮤니티',            c:'학생커뮤니티',  s:'GATEWAY', i:'🌀'},
+      {n:'수만휘',             u:'https://cafe.naver.com/suhui',       d:'수능 정보 카페',             c:'학생커뮤니티',  s:'GATEWAY', i:'📚'},
+      {n:'열품타',             u:'https://www.yeolpumta.com',          d:'공부 시간 측정',             c:'학생커뮤니티',  s:'GATEWAY', i:'🔥'},
+      // ── 입시·진로 ──
+      {n:'나이스 대국민',      u:'https://www.neis.go.kr',             d:'생기부·성적 확인',           c:'입시·진로',     s:'GATEWAY', i:'📋'},
+      {n:'어디가',             u:'https://www.adiga.kr',               d:'대입정보포털',               c:'입시·진로',     s:'GATEWAY', i:'🎓'},
+      {n:'진학사',             u:'https://www.jinhak.com',             d:'입시 합격 예측',             c:'입시·진로',     s:'GATEWAY', i:'📊'},
+      {n:'유웨이',             u:'https://www.uway.com',               d:'대입 전략',                  c:'입시·진로',     s:'GATEWAY', i:'🗺️'},
+      {n:'커리어넷',           u:'https://www.career.go.kr',           d:'적성검사·직업 탐색',         c:'입시·진로',     s:'GATEWAY', i:'🧭'},
+      {n:'LinkedIn',           u:'https://www.linkedin.com',           d:'글로벌 커리어',              c:'입시·진로',     s:'GATEWAY', i:'💼'},
+      {n:'Wanted',             u:'https://www.wanted.co.kr',           d:'IT 채용',                    c:'입시·진로',     s:'GATEWAY', i:'🎯'},
+      // ── 시간관리·집중 ──
+      {n:'Google Calendar',    u:'https://calendar.google.com',        d:'일정 관리',                  c:'시간관리·집중', s:'GATEWAY', i:'📅'},
+      {n:'열품타',             u:'https://www.yeolpumta.com',          d:'공부 시간 측정',             c:'시간관리·집중', s:'GATEWAY', i:'🔥'},
+      {n:'Todoist',            u:'https://todoist.com',                d:'투두 리스트',                c:'시간관리·집중', s:'GATEWAY', i:'📋'},
+      {n:'Forest',             u:'https://www.forestapp.cc',           d:'집중하면 나무 성장',         c:'시간관리·집중', s:'GATEWAY', i:'🌳'},
+      {n:'Pomofocus',          u:'https://pomofocus.io',               d:'뽀모도로 타이머',            c:'시간관리·집중', s:'GATEWAY', i:'🍅'},
+      {n:'네이버 캘린더',      u:'https://calendar.naver.com',         d:'일정·D-day',                 c:'시간관리·집중', s:'GATEWAY', i:'🗓️'},
+    ];
+
+    // State
+    let filterSrc = '';
+    let query = '';
+
+    const hero = document.getElementById('hero');
+    const ring = document.getElementById('ring');
+    const input = document.getElementById('q');
+    const clr = document.getElementById('clr');
+    const results = document.getElementById('results');
+    const grid = document.getElementById('grid');
+    const meta = document.getElementById('meta');
+
+    // Beam animation — 페이지 진입 시 1회, 모바일 제외
+    const beam = document.getElementById('beam');
+    const isMobileDevice = () => window.innerWidth <= 640;
+
+    function triggerBeam() {
+      if (isMobileDevice()) return;
+      const w = ring.offsetWidth;
+      const h = ring.offsetHeight;
+      const r = 20; // border-radius matches CSS 20px
+      // Rounded-rect path clockwise from top-center
+      const path = `M ${w/2},0 H ${w-r} A ${r},${r} 0 0,1 ${w},${r} V ${h-r} A ${r},${r} 0 0,1 ${w-r},${h} H ${r} A ${r},${r} 0 0,1 0,${h-r} V ${r} A ${r},${r} 0 0,1 ${r},0 H ${w/2}`;
+      beam.style.offsetPath = `path('${path}')`;
+      beam.classList.remove('go');
+      ring.classList.remove('glowing', 'glow-out');
+      void beam.offsetWidth;
+      beam.classList.add('go');
+    }
+
+    // 페이지 진입 시 자동 실행
+    window.addEventListener('load', () => { setTimeout(triggerBeam, 400); });
+
+    beam.addEventListener('animationend', () => {
+      beam.classList.remove('go');
+      ring.classList.remove('glow-out');
+      ring.classList.add('glowing');
+      setTimeout(() => {
+        ring.classList.remove('glowing');
+        // if still typing, go to typing glow; else fade out
+        if (input.value.length > 0) {
+          ring.classList.add('typing');
+        } else {
+          ring.classList.add('glow-out');
+        }
+      }, 350);
+    });
+
+    // Search
+    let debounceTimer = null;
+
+    input.addEventListener('input', () => {
+      query = input.value;
+      clr.classList.toggle('visible', query.length > 0);
+
+      if (query.length > 0) {
+        ring.classList.add('typing');
+        ring.classList.remove('glow-out');
+        if (!hero.classList.contains('shrunk')) {
+          hero.classList.add('shrunk');
+          window.scrollTo(0, 0);
+        }
+        results.style.display = 'block';
+      } else {
+        ring.classList.remove('typing');
+        hero.classList.remove('shrunk');
+        results.style.display = 'none';
+        window.scrollTo(0, 0);
+      }
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(render, 120);
+    });
+
+    clr.addEventListener('click', () => {
+      input.value = '';
+      query = '';
+      clr.classList.remove('visible');
+      hero.classList.remove('shrunk');
+      results.style.display = 'none';
+      window.scrollTo(0, 0);
+      input.focus();
+    });
+
+    // Mode dropdown
+    const modeBtn = document.getElementById('modeBtn');
+    const modeDropdown = document.getElementById('modeDropdown');
+    const modeLabel = document.getElementById('modeLabel');
+
+    modeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = modeDropdown.classList.toggle('open');
+      modeBtn.classList.toggle('open', open);
+    });
+
+    document.addEventListener('click', () => {
+      modeDropdown.classList.remove('open');
+      modeBtn.classList.remove('open');
+    });
+
+    document.querySelectorAll('.mode-option').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        filterSrc = opt.dataset.src;
+        modeLabel.textContent = opt.dataset.label;
+        modeDropdown.classList.remove('open');
+        modeBtn.classList.remove('open');
+        render();
+      });
+    });
+
+    const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+    function toChosung(str) {
+      return str.split('').map(ch => {
+        const code = ch.charCodeAt(0) - 0xAC00;
+        if (code < 0 || code > 11171) return ch;
+        return CHOSUNG[Math.floor(code / (21 * 28))];
+      }).join('');
+    }
+
+    function korMatch(text, q) {
+      const t = text.toLowerCase();
+      if (t.includes(q)) return true;
+      // 초성/자음만 입력한 경우
+      if (/^[ㄱ-ㅎ]+$/.test(q)) return toChosung(t).includes(q);
+      return false;
+    }
+
+    function render() {
+      const q = query.trim().toLowerCase();
+      const filtered = LINKS.filter(l => {
+        if (filterSrc && l.s !== filterSrc) return false;
+        if (!q) return true;
+        return korMatch(l.n + l.d + l.c + l.u, q);
+      });
+
+      meta.textContent = q ? `"${query}" — ${filtered.length}개 결과` : `${filtered.length}개`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="empty">검색 결과가 없습니다</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(l => `
+        <a class="r-card" href="${l.u}" target="_blank" rel="noopener">
+          <span class="r-icon">${l.i}</span>
+          <div class="r-text">
+            <div class="r-name">${l.n}${l.haktuksa ? '<span class="badge-haktuksa">학특사</span>' : ''}</div>
+            <div class="r-meta">${l.d} · ${l.c}</div>
+          </div>
+        </a>
+      `).join('');
+    }
+    </script>
+    </body>
+    </html>

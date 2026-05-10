@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HIGHWAY</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7P5XQCBCJP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-7P5XQCBCJP');
+  </script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020202;
+      --bg-deep: #050308;
+      --surface: rgba(255, 255, 255, 0.03);
+      --surface-strong: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f5f2ff;
+      --muted: #b6accd;
+      --gold: #facc15;
+      --gold-soft: rgba(250, 204, 21, 0.18);
+      --violet: #a855f7;
+      --violet-soft: rgba(168, 85, 247, 0.2);
+      --pink: #ec4899;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(168, 85, 247, 0.1), transparent 24%),
+        radial-gradient(circle at 86% 16%, rgba(250, 204, 21, 0.08), transparent 22%),
+        radial-gradient(circle at 76% 82%, rgba(236, 72, 153, 0.05), transparent 18%),
+        linear-gradient(160deg, #010101 0%, #050308 46%, #020103 100%);
+      background-attachment: fixed;
+      padding: 40px 24px 60px;
+      overflow-x: hidden;
+    }
+
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.28;
+    }
+
+    body::before {
+      top: -80px;
+      left: -60px;
+      background: rgba(168, 85, 247, 0.14);
+    }
+
+    body::after {
+      right: -80px;
+      bottom: -100px;
+      background: rgba(250, 204, 21, 0.12);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .logo {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: #fff7d6;
+      text-shadow:
+        0 0 30px rgba(250, 204, 21, 0.22),
+        0 0 60px rgba(168, 85, 247, 0.14);
+      line-height: 1;
+    }
+
+    .logo-accent {
+      background: linear-gradient(135deg, #facc15 30%, #a855f7 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-sub {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .logo-notice {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: rgba(182, 172, 205, 0.5);
+      letter-spacing: 0.02em;
+    }
+
+    .mobile-notice {
+      display: none;
+    }
+
+    /* ── Category Section ── */
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(250, 204, 21, 0.1);
+      border: 1px solid rgba(250, 204, 21, 0.25);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    .section-label.external {
+      color: #c084fc;
+      background: rgba(192, 132, 252, 0.1);
+      border-color: rgba(192, 132, 252, 0.25);
+    }
+
+    .section-label.flashcard {
+      color: #f472b6;
+      background: rgba(244, 114, 182, 0.1);
+      border-color: rgba(244, 114, 182, 0.25);
+    }
+
+    .section-label.simulator {
+      color: #fde047;
+      background: rgba(253, 224, 71, 0.1);
+      border-color: rgba(253, 224, 71, 0.25);
+    }
+
+    .section-label.highsystem {
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+      border-color: rgba(74, 222, 128, 0.25);
+    }
+
+    /* ── Quasarway Accordion ── */
+    .qw-toggle {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .qw-toggle:hover .section-label.highsystem {
+      background: rgba(74, 222, 128, 0.18);
+    }
+
+    .qw-chevron {
+      font-size: 0.72rem;
+      margin-left: 4px;
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+
+    .qw-chevron.open {
+      transform: rotate(180deg);
+    }
+
+    .grid.qw-grid {
+      display: none;
+    }
+
+    .grid.qw-grid.open {
+      display: grid;
+    }
+
+    .section-label.suhaeng {
+      color: #fb923c;
+      background: rgba(251, 146, 60, 0.1);
+      border-color: rgba(251, 146, 60, 0.25);
+    }
+
+    .card.suhaeng::before {
+      background: linear-gradient(180deg, rgba(251,146,60,0.8), rgba(250,204,21,0.8));
+    }
+
+    .card.suhaeng:hover {
+      border-color: rgba(251, 146, 60, 0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(251,146,60,0.12),
+        0 0 36px rgba(250,204,21,0.08),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(251,146,60,0.07), rgba(250,204,21,0.05));
+    }
+
+    .card.simulator::before {
+      background: linear-gradient(180deg, rgba(253,224,71,0.8), rgba(251,146,60,0.8));
+    }
+
+    .card.simulator:hover {
+      border-color: rgba(253,224,71,0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(253,224,71,0.12),
+        0 0 36px rgba(251,146,60,0.08),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(253,224,71,0.07), rgba(251,146,60,0.05));
+    }
+
+    .card.highsystem::before {
+      background: linear-gradient(180deg, rgba(74,222,128,0.8), rgba(168,85,247,0.8));
+    }
+
+    .card.highsystem:hover {
+      border-color: rgba(74,222,128,0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(74,222,128,0.12),
+        0 0 36px rgba(168,85,247,0.1),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(74,222,128,0.07), rgba(168,85,247,0.05));
+    }
+
+    .card.flashcard::before {
+      background: linear-gradient(180deg, rgba(244,114,182,0.8), rgba(250,204,21,0.8));
+    }
+
+    .card.flashcard:hover {
+      border-color: rgba(244, 114, 182, 0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(244,114,182,0.12),
+        0 0 36px rgba(250,204,21,0.08),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(244,114,182,0.07), rgba(250,204,21,0.05));
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent);
+    }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Card ── */
+    .card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 18px;
+      padding: 20px 20px 16px;
+      min-height: 110px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.038), rgba(255,255,255,0.018));
+      border: 1px solid var(--border);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 0 16px rgba(168,85,247,0.05),
+        0 0 20px rgba(250,204,21,0.04),
+        0 8px 32px rgba(0,0,0,0.45);
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+      cursor: pointer;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: linear-gradient(180deg, rgba(250,204,21,0.8), rgba(168,85,247,0.8));
+      opacity: 0.65;
+      transition: opacity 0.25s ease;
+    }
+
+    .card.external::before {
+      background: linear-gradient(180deg, rgba(192,132,252,0.8), rgba(250,204,21,0.8));
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(250, 204, 21, 0.35);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(250,204,21,0.1),
+        0 0 36px rgba(168,85,247,0.12),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(250,204,21,0.06), rgba(168,85,247,0.07));
+    }
+
+    .card.external:hover {
+      border-color: rgba(192, 132, 252, 0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 24px rgba(192,132,252,0.12),
+        0 0 36px rgba(250,204,21,0.08),
+        0 16px 48px rgba(0,0,0,0.55);
+      background: linear-gradient(145deg, rgba(192,132,252,0.07), rgba(250,204,21,0.05));
+    }
+
+    .card:hover::after {
+      transform: translateX(100%);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff8dc;
+      margin-bottom: auto;
+      padding-bottom: 14px;
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .badge-haktuksa {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 5px;
+      padding: 2px 7px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-url {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0.75;
+    }
+
+    .card-arrow {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .card:hover .card-arrow {
+      opacity: 0.6;
+      transform: translateX(0);
+    }
+
+    /* ── Search ── */
+    .search-wrap {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mobile-search-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(10px);
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .mobile-search-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(5, 3, 8, 0.75);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 18px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      width: 0;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: width 0.3s ease, opacity 0.25s ease, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box.open {
+      width: 280px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .search-box:focus-within {
+      border-color: rgba(250,204,21,0.35);
+      box-shadow: 0 0 16px rgba(250,204,21,0.08);
+    }
+
+    .search-icon {
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .search-input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    .search-input::placeholder {
+      color: rgba(182,172,205,0.4);
+    }
+
+    .search-clear {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    .search-clear:hover {
+      color: #fff;
+    }
+
+    .no-results {
+      display: none;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 40px 0;
+      opacity: 0.6;
+    }
+
+    /* ── Quick Bar ── */
+    .quick-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.32rem 1.1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(45,212,191,0.35);
+      background: rgba(45,212,191,0.05);
+      color: #2dd4bf;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 10px rgba(45,212,191,0.12), 0 0 22px rgba(45,212,191,0.06);
+    }
+
+    .quick-btn:hover {
+      border-color: rgba(45,212,191,0.7);
+      background: rgba(45,212,191,0.1);
+      box-shadow: 0 0 14px rgba(45,212,191,0.25), 0 0 36px rgba(45,212,191,0.12);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      font-size: 0.78rem;
+      color: rgba(182, 172, 205, 0.4);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      body {
+        padding: 0 0 80px;
+        background-attachment: scroll;
+      }
+
+      .page {
+        padding: 0;
+      }
+
+      /* 모바일 상단 헤더+검색창 묶어서 sticky */
+      .sticky-bar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .header {
+        margin-bottom: 0;
+        padding: 16px 20px 14px;
+        background: rgba(5, 3, 8, 0.82);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        text-align: center;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        letter-spacing: 0.12em;
+      }
+
+      .logo-sub {
+        font-size: 0.72rem;
+        margin-top: 0;
+        letter-spacing: 0.08em;
+      }
+
+      /* 검색창: sticky-bar 안에서 static으로 */
+      .search-wrap {
+        position: static;
+        width: 100%;
+        padding: 8px 16px 12px;
+        background: rgba(5, 3, 8, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        justify-content: flex-end;
+        display: flex;
+      }
+
+      /* 모바일 돋보기 버튼 */
+      .mobile-search-btn {
+        display: flex;
+      }
+
+      .search-box {
+        width: 0;
+        max-width: 260px;
+        padding: 0;
+        overflow: hidden;
+        border: none;
+        background: none;
+        transition: width 0.25s ease, padding 0.25s ease, border 0.25s ease;
+      }
+
+      .search-box.open {
+        width: 220px;
+        padding: 7px 12px;
+        background: rgba(5, 3, 8, 0.75);
+        border: 1px solid rgba(250,204,21,0.35);
+      }
+
+      .search-icon {
+        display: none;
+      }
+
+      /* PC의 notice는 숨기고 모바일 전용 notice 표시 */
+      .header .logo-notice {
+        display: none;
+      }
+
+      .mobile-notice {
+        display: block;
+        text-align: center;
+        margin: 0 16px 0;
+        padding-bottom: 4px;
+      }
+
+      /* 스크롤 가능한 콘텐츠 영역 */
+      .content {
+        padding: 20px 16px 0;
+      }
+
+      .section {
+        margin-bottom: 28px;
+      }
+
+      .section-header {
+        margin-bottom: 12px;
+      }
+
+      .section-label {
+        font-size: 0.72rem;
+        padding: 2px 8px;
+      }
+
+      /* 모바일 카드: 2열 그리드 */
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .card {
+        min-height: 88px;
+        padding: 14px 12px 11px 16px;
+        border-radius: 14px;
+        /* 터치 피드백 */
+        -webkit-tap-highlight-color: rgba(250,204,21,0.08);
+
+      }
+
+      .card:active {
+        transform: scale(0.97);
+        transition: transform 0.1s ease;
+      }
+
+      .card-name {
+        font-size: 0.88rem;
+        padding-bottom: 8px;
+      }
+
+      .card-url {
+        font-size: 0.7rem;
+      }
+
+      /* 화살표 항상 표시 */
+      .card-arrow {
+        opacity: 0.35;
+        transform: translateX(0);
+        font-size: 0.8rem;
+        top: 12px;
+        right: 12px;
+      }
+
+      .footer {
+        margin-top: 36px;
+        padding-bottom: 16px;
+        font-size: 0.72rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 72px;
+        flex-direction: row;
+        align-items: center;
+        padding: 14px 14px 14px 16px;
+      }
+
+      .card-name {
+        padding-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="sticky-bar">
+    <header class="header">
+      <h1 class="logo"><span class="logo-accent">HIGHWAY</span></h1>
+      <p class="logo-sub">LINK highway &nbsp;·&nbsp; by QUASARWAY</p>
+      <p class="logo-notice">학특사, 프로젝트 등의 링크를 연동시키고 싶은 분은 관리자 카카오톡 개인 톡으로 연락바랍니다.</p>
+    </header>
+
+    <!-- 검색창 (PC: fixed 우상단 / 모바일: 헤더 바로 아래 sticky) -->
+    <div class="search-wrap">
+      <button class="mobile-search-btn" id="mobileSearchBtn">🔍</button>
+      <div class="search-box" id="searchBox">
+        <span class="search-icon" id="searchIcon">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="검색..." autocomplete="off" />
+        <button class="search-clear" id="searchClear">✕</button>
+      </div>
+    </div>
+    </div><!-- /.sticky-bar -->
+
+    <div class="content">
+
+    <!-- 빠른 바로가기 -->
+    <div class="quick-bar">
+      <a class="quick-btn" href="https://link109.xyz/milestone" target="_blank">🔭 Milestone에서 모든 Quasarway project를 검색하세요! ↗</a>
+    </div>
+
+    <!-- 학급 카테고리 -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-label">학급</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="grid">
+        <a class="card" href="https://ds109.life" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">1-9 아지트 <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">ds109.life</div>
+        </a>
+        <a class="card" href="https://plax-eta.vercel.app" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">Secret Garden <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">plax-eta.vercel.app</div>
+        </a>
+        <a class="card" href="https://bytenode109.vercel.app" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">bytenode <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">bytenode109.vercel.app</div>
+        </a>
+        <a class="card" href="https://byteexam109.vercel.app" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">byteexam <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">byteexam109.vercel.app</div>
+        </a>
+        <a class="card" href="https://luxzbi.github.io/time/" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">자습 타이머 도구 <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">luxzbi.github.io/time</div>
+        </a>
+        <a class="card" href="https://luxzbi.github.io/CIP/" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">CIP 시간표 <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">luxzbi.github.io/CIP</div>
+        </a>
+        <a class="card" href="https://bettercip.pages.dev/" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">1-9 betterCIP by kmk</div>
+          <div class="card-url">bettercip.pages.dev</div>
+        </a>
+        <a class="card" href="https://bettercip.pages.dev/student" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">betterCIP 개인 출석 설정</div>
+          <div class="card-url">bettercip.pages.dev/student</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Quasarway group 카테고리 -->
+    <section class="section" id="quasarway-section">
+      <div class="section-header">
+        <span class="section-label highsystem">Quasarway group</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="grid">
+        <a class="card highsystem" href="/quasarway.html" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">Quasarway <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">link109.xyz/quasarway</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 외부 카테고리 -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-label external">외부</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="grid">
+        <a class="card external" href="https://classroom.google.com" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">클래스룸</div>
+          <div class="card-url">classroom.google.com</div>
+        </a>
+        <a class="card external" href="https://front.superschool.link" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">슈퍼스쿨</div>
+          <div class="card-url">front.superschool.link</div>
+        </a>
+        <a class="card external" href="https://dshub.kro.kr" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">dshub</div>
+          <div class="card-url">dshub.kro.kr</div>
+        </a>
+        <a class="card external" href="https://ds109.life/s/6hn1pG" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">대입과목 가이드</div>
+          <div class="card-url">ds109.life/s/6hn1pG</div>
+        </a>
+        <a class="card external" href="https://ds109.life/s/awHj1I" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">수강신청 시뮬레이터</div>
+          <div class="card-url">ds109.life/s/awHj1I</div>
+        </a>
+        <a class="card external" href="https://www.dshs.kr/" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">학교 홈페이지</div>
+          <div class="card-url">dshs.kr</div>
+        </a>
+        <a class="card external" href="https://ds109.life/s/7jrSEZ" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">CIP 좌석관리</div>
+          <div class="card-url">ds109.life/s/7jrSEZ</div>
+        </a>
+        <a class="card external" href="https://ds109.life/s/U7WUev" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">CIP 불참 예약</div>
+          <div class="card-url">ds109.life/s/U7WUev</div>
+        </a>
+        <a class="card external" href="https://ds109.life/s/UQOE9Q" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">수강신청 프로그램</div>
+          <div class="card-url">ds109.life/s/UQOE9Q</div>
+        </a>
+      </div>
+    </section>
+
+
+    <!-- 시뮬레이터 카테고리 -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-label simulator">시뮬레이터</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="grid">
+        <a class="card simulator" href="https://luxzbi.github.io/ss/" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">DNA 시뮬레이터</div>
+          <div class="card-url">luxzbi.github.io/ss</div>
+        </a>
+        <a class="card simulator" href="https://luxzbi.github.io/chch/" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">볼츠만 뇌 이론 시뮬레이터</div>
+          <div class="card-url">luxzbi.github.io/chch</div>
+        </a>
+        <a class="card simulator" href="https://luxzbi.github.io/accs" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">석굴암 시뮬레이터</div>
+          <div class="card-url">luxzbi.github.io/accs</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 수행평가 카테고리 -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-label suhaeng">수행평가</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="grid">
+        <a class="card suhaeng" href="https://url.kr/vjfvv3" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">과학 질의응답</div>
+          <div class="card-url">url.kr/vjfvv3</div>
+        </a>
+      </div>
+    </section>
+
+    <div class="no-results" id="noResults">검색 결과가 없습니다.</div>
+
+    <p class="logo-notice mobile-notice">학특사, 프로젝트 등의 링크를 연동시키고 싶은 분은 관리자 카카오톡 개인 톡으로 연락바랍니다.</p>
+
+    <footer class="footer">
+      <div>© 2026 DSHS 1-9 &nbsp;All rights reserved.</div>
+      <div style="margin-top:6px;">Developed by <span style="color:rgba(250,204,21,0.55);">Choi ju yeong</span></div>
+    </footer>
+
+    </div><!-- /.content -->
+  </div>
+  <script>
+    const searchBox   = document.getElementById('searchBox');
+    const searchInput = document.getElementById('searchInput');
+    const searchIcon  = document.getElementById('searchIcon');
+    const searchClear = document.getElementById('searchClear');
+    const noResults   = document.getElementById('noResults');
+    const sections    = document.querySelectorAll('.section');
+
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+    const isMobile = () => window.innerWidth <= 600;
+
+    mobileSearchBtn.addEventListener('click', () => {
+      const open = searchBox.classList.toggle('open');
+      if (open) {
+        searchInput.focus();
+      } else {
+        searchInput.value = '';
+        runFilter('');
+      }
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchInput.focus();
+      runFilter('');
+    });
+
+    searchInput.addEventListener('input', () => runFilter(searchInput.value));
+
+    // Quasarway 아코디언
+    const qwGrid    = document.getElementById('quasarway-grid');
+    const qwChevron = document.getElementById('qwChevron');
+    let qwOpen = false;
+
+    function toggleQW(forceOpen) {
+      qwOpen = forceOpen !== undefined ? forceOpen : !qwOpen;
+      qwGrid.classList.toggle('open', qwOpen);
+      qwChevron.classList.toggle('open', qwOpen);
+    }
+
+    function runFilter(query) {
+      const q = query.trim().toLowerCase();
+      let totalVisible = 0;
+
+      sections.forEach(section => {
+        const cards = section.querySelectorAll('.card');
+        let sectionVisible = 0;
+
+        cards.forEach(card => {
+          const name = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
+          const url  = card.querySelector('.card-url')?.textContent.toLowerCase() || '';
+          const match = !q || name.includes(q) || url.includes(q);
+          card.style.display = match ? '' : 'none';
+          if (match) sectionVisible++;
+        });
+
+        section.style.display = sectionVisible > 0 ? '' : 'none';
+        totalVisible += sectionVisible;
+
+        // 검색 시 Quasarway 아코디언 자동 열기/닫기
+        if (section.id === 'quasarway-section') {
+          toggleQW(q ? sectionVisible > 0 : false);
+        }
+      });
+
+      noResults.style.display = q && totalVisible === 0 ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

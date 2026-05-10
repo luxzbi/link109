@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TIMEWAY — DSHS 1-9</title>
+  <style>
+    :root {
+      --mint: #f87171; --purple: #c084fc;
+      --bg: #0a0a0f; --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --text: #e2e8f0; --subtext: #94a3b8;
+      --accent: #2dd4bf;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 20%, rgba(45,212,191,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 80% 80%, rgba(192,132,252,0.05) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    header {
+      padding: 1.4rem 2rem 1rem;
+      display: flex; align-items: center; gap: 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: relative; z-index: 1; flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: 0.12em;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header-sub { font-size: 0.75rem; color: var(--subtext); letter-spacing: 0.06em; }
+    .back-btn {
+      margin-left: auto; font-size: 0.75rem; color: var(--subtext);
+      text-decoration: none; padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
+
+    main { padding: 2rem; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .section-label {
+      display: inline-block; font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 0.9rem; padding: 0.25rem 0.7rem;
+      border-radius: 6px; border: 1px solid rgba(45,212,191,0.4);
+      background: rgba(45,212,191,0.08); color: var(--accent);
+    }
+
+    /* ── 오늘 요약 ── */
+    .today-wrap { margin-bottom: 2.5rem; }
+    .today-cards { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .today-card {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 0.18rem;
+      padding: 0.7rem 0.85rem; min-width: 72px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; position: relative; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .today-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: linear-gradient(180deg, var(--accent), var(--purple));
+      border-radius: 3px 0 0 3px;
+    }
+    .today-card.now {
+      border-color: rgba(45,212,191,0.55);
+      background: rgba(45,212,191,0.08);
+    }
+    .today-card.now::before { background: linear-gradient(180deg, #facc15, var(--accent)); }
+    .today-card.past { opacity: 0.35; }
+    .tc-num { font-size: 0.58rem; color: var(--subtext); font-weight: 600; letter-spacing: 0.04em; }
+    .tc-subj { font-size: 0.8rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+    .today-card.now .tc-subj { color: var(--accent); }
+    .tc-time { font-size: 0.56rem; color: var(--subtext); }
+    .now-tag {
+      font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em;
+      color: #facc15; background: rgba(250,204,21,0.12);
+      border: 1px solid rgba(250,204,21,0.3); border-radius: 3px;
+      padding: 1px 4px;
+    }
+
+    /* ── 주간 시간표 ── */
+    .table-wrap { margin-top: 2rem; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    th, td {
+      padding: 0.6rem 0.45rem; text-align: center;
+      border: 1px solid rgba(255,255,255,0.06); font-size: 0.8rem;
+    }
+    thead th {
+      background: rgba(255,255,255,0.04); font-weight: 700;
+      font-size: 0.72rem; letter-spacing: 0.08em; color: var(--subtext);
+    }
+    thead th.today-col { color: var(--accent); background: rgba(45,212,191,0.07); }
+    .period-hd {
+      font-size: 0.65rem; color: var(--subtext);
+      background: rgba(255,255,255,0.02); white-space: nowrap; line-height: 1.5;
+    }
+    td.today-col { background: rgba(45,212,191,0.04); }
+    td.now-cell {
+      background: rgba(45,212,191,0.14) !important;
+      color: var(--accent); font-weight: 700;
+      border-color: rgba(45,212,191,0.3);
+    }
+    tr:hover td { background: rgba(255,255,255,0.025); }
+    tr:hover td.today-col { background: rgba(45,212,191,0.07); }
+    tr:hover td.now-cell { background: rgba(45,212,191,0.18) !important; }
+
+    footer {
+      text-align: center; padding: 2rem; font-size: 0.68rem;
+      color: rgba(148,163,184,0.4);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      position: relative; z-index: 1;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 1rem; }
+      main { padding: 1rem; }
+      .today-card { padding: 0.55rem 0.65rem; min-width: 62px; }
+      .tc-subj { font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">TIMEWAY</div>
+    <div class="header-sub">DSHS 1-9 · 시간표</div>
+  </div>
+  <a class="back-btn" href="../">← Highway</a>
+</header>
+<main>
+
+  <div class="today-wrap">
+    <div class="section-label" id="todayLabel">오늘 시간표</div>
+    <div class="today-cards" id="todayCards"></div>
+  </div>
+
+  <div class="section-label">주간 시간표</div>
+  <div class="table-wrap">
+    <table id="timetable"></table>
+  </div>
+
+</main>
+<footer>© 2026 DSHS 1-9 &nbsp;All rights reserved. Developed by <span style="color:var(--accent)">Choi ju yeong</span></footer>
+
+<script>
+  const SCHEDULE = {
+    월: ['통합과학1',    '한국사1',       '공통수학1',       '삶과종교',      '공통영어1',     '독서토론과글쓰기', '통합사회1'],
+    화: ['공통국어1',    '통합사회1',     '공통영어1',       '한국사1',       '공통수학1',     '미술1',           '과학탐구실험'],
+    수: ['공통수학1',    '체육1',         '미술1',           '통합사회1',     '',              '독서토론과글쓰기', '공통영어1'],
+    목: ['진로·학업설계','통합과학1',     '독서토론과글쓰기', '체육1',         '미술1',         '공통수학1',       '공통국어1'],
+    금: ['한국사1',      '공통영어1',     '공통국어1',       '통합과학1',     '자율·자치활동', '진로활동',        '진로활동'],
+  };
+
+  const PERIODS = [
+    { label: '1교시', start: '08:30', end: '09:20' },
+    { label: '2교시', start: '09:30', end: '10:20' },
+    { label: '3교시', start: '10:30', end: '11:20' },
+    { label: '4교시', start: '11:30', end: '12:20' },
+    { label: '5교시', start: '13:40', end: '14:30' },
+    { label: '6교시', start: '14:40', end: '15:30' },
+    { label: '7교시', start: '15:40', end: '16:30' },
+  ];
+
+  const DAYS = ['월', '화', '수', '목', '금'];
+  const DOW  = [null, '월', '화', '수', '목', '금', null];
+
+  function toMin(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  function nowMin() {
+    const n = new Date();
+    return n.getHours() * 60 + n.getMinutes();
+  }
+
+  function currentPeriod() {
+    const m = nowMin();
+    for (let i = 0; i < PERIODS.length; i++) {
+      if (m >= toMin(PERIODS[i].start) && m <= toMin(PERIODS[i].end)) return i;
+    }
+    return -1;
+  }
+
+  function todayKey() { return DOW[new Date().getDay()]; }
+
+  // ── 오늘 요약 ──
+  (function () {
+    const key = todayKey();
+    const label = document.getElementById('todayLabel');
+    const wrap  = document.getElementById('todayCards');
+    if (!key) { label.textContent = '주말 — 오늘은 수업이 없어요 🎉'; return; }
+    label.textContent = `오늘 시간표 (${key}요일)`;
+    const cur = currentPeriod();
+    const nm  = nowMin();
+    SCHEDULE[key].forEach((subj, i) => {
+      const past = nm > toMin(PERIODS[i].end);
+      const now  = i === cur;
+      wrap.innerHTML += `
+        <div class="today-card${now ? ' now' : past ? ' past' : ''}">
+          <div class="tc-num">${PERIODS[i].label}</div>
+          <div class="tc-subj">${subj}</div>
+          <div class="tc-time">${PERIODS[i].start}</div>
+          ${now ? '<div class="now-tag">NOW</div>' : ''}
+        </div>`;
+    });
+  })();
+
+  // ── 주간 시간표 ──
+  (function () {
+    const key = todayKey();
+    const cur = currentPeriod();
+    const t   = document.getElementById('timetable');
+
+    let h = '<thead><tr><th>교시</th>';
+    DAYS.forEach(d => {
+      h += `<th class="${d === key ? 'today-col' : ''}">${d}요일${d === key ? ' ●' : ''}</th>`;
+    });
+    h += '</tr></thead><tbody>';
+
+    PERIODS.forEach((p, i) => {
+      h += '<tr>';
+      const isNowRow = i === cur;
+      h += `<td class="period-hd">${p.label}<br><span style="font-size:0.56rem">${p.start}–${p.end}</span>${isNowRow ? '<br><span class="now-tag">NOW</span>' : ''}</td>`;
+      DAYS.forEach(d => {
+        const today  = d === key;
+        const nowCell = today && isNowRow;
+        h += `<td class="${nowCell ? 'now-cell' : today ? 'today-col' : ''}">${SCHEDULE[d][i]}</td>`;
+      });
+      h += '</tr>';
+    });
+
+    t.innerHTML = h + '</tbody>';
+  })();
+</script>
+</body>
+</html>

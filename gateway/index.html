@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GATEWAY — DSHS 1-9</title>
+  <style>
+    :root { --mint: #f87171; --purple: #c084fc; --bg: #0a0a0f; --card-bg: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.08); --text: #e2e8f0; --subtext: #94a3b8; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 60% 40% at 20% 20%, rgba(248,113,113,0.08) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(192,132,252,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    header { padding: 1.4rem 2rem 1rem; display: flex; align-items: center; gap: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; position: relative; z-index: 1; }
+    .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.12em; background: linear-gradient(135deg, var(--mint), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header-sub { font-size: 0.75rem; color: var(--subtext); letter-spacing: 0.06em; }
+    .header-right { margin-left: auto; }
+    .search-toggle-btn { background: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: var(--subtext); cursor: pointer; padding: 0.4rem 0.7rem; font-size: 1rem; transition: border-color 0.2s, color 0.2s; }
+    .search-toggle-btn:hover { border-color: var(--mint); color: var(--mint); }
+    .search-wrap { display: none; width: 100%; padding: 0.6rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 1; }
+    .search-wrap.open { display: block; }
+    #search { width: 100%; padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+    #search:focus { border-color: var(--mint); }
+    #search::placeholder { color: var(--subtext); }
+    main { padding: 2rem; max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+    .category { margin-bottom: 2.5rem; }
+    .cat-label { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid rgba(248,113,113,0.4); background: linear-gradient(135deg, rgba(248,113,113,0.12), rgba(192,132,252,0.10)); color: var(--mint); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+    .card { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 0.9rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; text-decoration: none; color: var(--text); transition: background 0.2s, border-color 0.2s, transform 0.15s; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, rgba(248,113,113,0.8), rgba(192,132,252,0.8)); border-radius: 3px 0 0 3px; }
+    .card:hover { background: rgba(255,255,255,0.08); border-color: rgba(248,113,113,0.35); transform: translateY(-2px); }
+    .card-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .card-text { overflow: hidden; }
+    .card-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-desc { font-size: 0.7rem; color: var(--subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    footer { text-align: center; padding: 2rem; font-size: 0.72rem; color: rgba(148,163,184,0.45); border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 1; }
+    .hidden { display: none !important; }
+    .badge-haktuksa {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 600px) { header { padding: 1rem; } main { padding: 1rem; } }
+  </style>
+</head>
+<body>
+<header>
+  <div><div class="logo">GATEWAY</div><div class="header-sub">DSHS 1-9 · QUASARWAY Links</div></div>
+  <div class="header-right"><button class="search-toggle-btn" id="stb">🔍</button></div>
+</header>
+<div class="search-wrap" id="sw"><input type="text" id="search" placeholder="링크 검색…" oninput="filterCards()" /></div>
+<main>
+
+<div class="category"><div class="cat-label">Quasarway group</div><div class="cards">
+  <a class="card" href="https://link109.xyz" target="_blank" rel="noopener"><span class="card-icon">🛣️</span><div class="card-text"><div class="card-name">HIGHWAY</div><div class="card-desc">메인 링크허브</div></div></a>
+  <a class="card" href="/quasarway.html" target="_blank" rel="noopener"><span class="card-icon">🚀</span><div class="card-text"><div class="card-name">Quasarway</div><div class="card-desc">Quasarway 전체 링크</div></div></a>
+  <a class="card" href="https://plax-eta.vercel.app" target="_blank" rel="noopener"><span class="card-icon">🌿</span><div class="card-text"><div class="card-name">Secret Garden</div><div class="card-desc">비밀 게시판</div></div></a>
+  <a class="card" href="https://link109.xyz/gateway" target="_blank" rel="noopener"><span class="card-icon">🌐</span><div class="card-text"><div class="card-name">Gateway</div><div class="card-desc">종합 링크 허브</div></div></a>
+  <a class="card" href="https://link109.xyz/milestone" target="_blank" rel="noopener"><span class="card-icon">🔭</span><div class="card-text"><div class="card-name">Milestone</div><div class="card-desc">통합 검색</div></div></a>
+  <a class="card" href="/gateway/timeway.html" target="_blank" rel="noopener"><span class="card-icon">🗓️</span><div class="card-text"><div class="card-name">Timeway</div><div class="card-desc">1-9 시간표</div></div></a>
+  <a class="card" href="https://ztec.kr" target="_blank" rel="noopener"><span class="card-icon">📈</span><div class="card-text"><div class="card-name">주식게임-CCX v1</div><div class="card-desc">학특사 주식게임</div></div></a>
+  <a class="card" href="https://luxzbi.github.io/CIP/" target="_blank" rel="noopener"><span class="card-icon">📋</span><div class="card-text"><div class="card-name">CIP 시간표</div><div class="card-desc">학특사 시간표</div></div></a>
+  <a class="card" href="https://luxzbi.github.io/time/" target="_blank" rel="noopener"><span class="card-icon">⏱️</span><div class="card-text"><div class="card-name">자습 타이머</div><div class="card-desc">학특사 타이머 도구</div></div></a>
+  <a class="card" href="https://bytenode109.vercel.app" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">bytenode <span class="badge-haktuksa">학특사</span></div><div class="card-desc">블로그 & AI 시험지</div></div></a>
+  <a class="card" href="https://byteexam109.vercel.app" target="_blank" rel="noopener"><span class="card-icon">📋</span><div class="card-text"><div class="card-name">byteexam <span class="badge-haktuksa">학특사</span></div><div class="card-desc">AI 시험지 플랫폼</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">AI 어시스턴트</div><div class="cards">
+  <a class="card" href="https://chatgpt.com" target="_blank" rel="noopener"><span class="card-icon">💬</span><div class="card-text"><div class="card-name">ChatGPT</div><div class="card-desc">OpenAI</div></div></a>
+  <a class="card" href="https://claude.ai" target="_blank" rel="noopener"><span class="card-icon">🤖</span><div class="card-text"><div class="card-name">Claude</div><div class="card-desc">Anthropic AI</div></div></a>
+  <a class="card" href="https://gemini.google.com" target="_blank" rel="noopener"><span class="card-icon">✨</span><div class="card-text"><div class="card-name">Gemini</div><div class="card-desc">Google AI</div></div></a>
+  <a class="card" href="https://www.perplexity.ai" target="_blank" rel="noopener"><span class="card-icon">🔎</span><div class="card-text"><div class="card-name">Perplexity</div><div class="card-desc">AI 검색</div></div></a>
+  <a class="card" href="https://deepseek.com" target="_blank" rel="noopener"><span class="card-icon">🐋</span><div class="card-text"><div class="card-name">DeepSeek</div><div class="card-desc">DeepSeek AI</div></div></a>
+  <a class="card" href="https://grok.com" target="_blank" rel="noopener"><span class="card-icon">⚡</span><div class="card-text"><div class="card-name">Grok</div><div class="card-desc">xAI</div></div></a>
+  <a class="card" href="https://copilot.microsoft.com" target="_blank" rel="noopener"><span class="card-icon">🪟</span><div class="card-text"><div class="card-name">Copilot</div><div class="card-desc">Microsoft AI</div></div></a>
+  <a class="card" href="https://notebooklm.google.com" target="_blank" rel="noopener"><span class="card-icon">📓</span><div class="card-text"><div class="card-name">NotebookLM</div><div class="card-desc">Google NotebookLM</div></div></a>
+  <a class="card" href="https://poe.com" target="_blank" rel="noopener"><span class="card-icon">🌀</span><div class="card-text"><div class="card-name">Poe</div><div class="card-desc">멀티 AI 플랫폼</div></div></a>
+  <a class="card" href="https://you.com" target="_blank" rel="noopener"><span class="card-icon">🔍</span><div class="card-text"><div class="card-name">You.com</div><div class="card-desc">AI 검색</div></div></a>
+  <a class="card" href="https://www.phind.com" target="_blank" rel="noopener"><span class="card-icon">💡</span><div class="card-text"><div class="card-name">Phind</div><div class="card-desc">개발자용 AI 검색</div></div></a>
+  <a class="card" href="https://consensus.app" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">Consensus</div><div class="card-desc">논문 기반 AI 검색</div></div></a>
+  <a class="card" href="https://www.chatpdf.com" target="_blank" rel="noopener"><span class="card-icon">📄</span><div class="card-text"><div class="card-name">ChatPDF</div><div class="card-desc">PDF 대화 AI</div></div></a>
+  <a class="card" href="https://pdf.ai" target="_blank" rel="noopener"><span class="card-icon">📑</span><div class="card-text"><div class="card-name">PDF.ai</div><div class="card-desc">PDF AI 분석</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">AI 이미지 & 영상</div><div class="cards">
+  <a class="card" href="https://www.midjourney.com" target="_blank" rel="noopener"><span class="card-icon">🎨</span><div class="card-text"><div class="card-name">Midjourney</div><div class="card-desc">이미지 생성 AI</div></div></a>
+  <a class="card" href="https://runwayml.com" target="_blank" rel="noopener"><span class="card-icon">🎬</span><div class="card-text"><div class="card-name">Runway</div><div class="card-desc">영상 생성 AI</div></div></a>
+  <a class="card" href="https://leonardo.ai" target="_blank" rel="noopener"><span class="card-icon">🖼️</span><div class="card-text"><div class="card-name">Leonardo AI</div><div class="card-desc">AI 이미지 생성</div></div></a>
+  <a class="card" href="https://ideogram.ai" target="_blank" rel="noopener"><span class="card-icon">🔤</span><div class="card-text"><div class="card-name">Ideogram</div><div class="card-desc">텍스트 포함 이미지</div></div></a>
+  <a class="card" href="https://playground.com" target="_blank" rel="noopener"><span class="card-icon">🎠</span><div class="card-text"><div class="card-name">Playground AI</div><div class="card-desc">무료 이미지 생성</div></div></a>
+  <a class="card" href="https://lumalabs.ai" target="_blank" rel="noopener"><span class="card-icon">🌌</span><div class="card-text"><div class="card-name">Luma AI</div><div class="card-desc">3D·영상 AI</div></div></a>
+  <a class="card" href="https://pika.art" target="_blank" rel="noopener"><span class="card-icon">🎥</span><div class="card-text"><div class="card-name">Pika</div><div class="card-desc">AI 영상 생성</div></div></a>
+  <a class="card" href="https://clipdrop.co" target="_blank" rel="noopener"><span class="card-icon">✂️</span><div class="card-text"><div class="card-name">Clipdrop</div><div class="card-desc">AI 이미지 편집</div></div></a>
+  <a class="card" href="https://www.freepik.com/ai" target="_blank" rel="noopener"><span class="card-icon">🖌️</span><div class="card-text"><div class="card-name">Freepik AI</div><div class="card-desc">AI 디자인 생성</div></div></a>
+  <a class="card" href="https://www.krea.ai" target="_blank" rel="noopener"><span class="card-icon">🌈</span><div class="card-text"><div class="card-name">Krea</div><div class="card-desc">실시간 AI 생성</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">AI 음성 & 음악</div><div class="cards">
+  <a class="card" href="https://suno.com" target="_blank" rel="noopener"><span class="card-icon">🎵</span><div class="card-text"><div class="card-name">Suno</div><div class="card-desc">AI 음악 생성</div></div></a>
+  <a class="card" href="https://elevenlabs.io" target="_blank" rel="noopener"><span class="card-icon">🎙️</span><div class="card-text"><div class="card-name">ElevenLabs</div><div class="card-desc">AI 음성 합성</div></div></a>
+  <a class="card" href="https://www.udio.com" target="_blank" rel="noopener"><span class="card-icon">🎶</span><div class="card-text"><div class="card-name">Udio</div><div class="card-desc">AI 음악 생성</div></div></a>
+  <a class="card" href="https://typecast.ai" target="_blank" rel="noopener"><span class="card-icon">🔊</span><div class="card-text"><div class="card-name">타입캐스트</div><div class="card-desc">한국어 AI 성우</div></div></a>
+  <a class="card" href="https://murf.ai" target="_blank" rel="noopener"><span class="card-icon">🎤</span><div class="card-text"><div class="card-name">Murf AI</div><div class="card-desc">AI 내레이션</div></div></a>
+  <a class="card" href="https://soundraw.io" target="_blank" rel="noopener"><span class="card-icon">🎸</span><div class="card-text"><div class="card-name">Soundraw</div><div class="card-desc">AI 배경음악</div></div></a>
+  <a class="card" href="https://www.aiva.ai" target="_blank" rel="noopener"><span class="card-icon">🎹</span><div class="card-text"><div class="card-name">AIVA</div><div class="card-desc">AI 작곡</div></div></a>
+  <a class="card" href="https://boomy.com" target="_blank" rel="noopener"><span class="card-icon">🥁</span><div class="card-text"><div class="card-name">Boomy</div><div class="card-desc">AI 음악 제작</div></div></a>
+  <a class="card" href="https://play.ht" target="_blank" rel="noopener"><span class="card-icon">▶️</span><div class="card-text"><div class="card-name">PlayHT</div><div class="card-desc">AI TTS</div></div></a>
+  <a class="card" href="https://mubert.com" target="_blank" rel="noopener"><span class="card-icon">🎧</span><div class="card-text"><div class="card-name">Mubert</div><div class="card-desc">AI 스트리밍 음악</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">CodingAI</div><div class="cards">
+  <a class="card" href="https://cursor.com" target="_blank" rel="noopener"><span class="card-icon">🖱️</span><div class="card-text"><div class="card-name">Cursor</div><div class="card-desc">AI 코드 에디터</div></div></a>
+  <a class="card" href="https://v0.dev" target="_blank" rel="noopener"><span class="card-icon">🔷</span><div class="card-text"><div class="card-name">v0</div><div class="card-desc">Vercel AI UI 생성</div></div></a>
+  <a class="card" href="https://bolt.new" target="_blank" rel="noopener"><span class="card-icon">⚡</span><div class="card-text"><div class="card-name">Bolt</div><div class="card-desc">AI 앱 빌더</div></div></a>
+  <a class="card" href="https://lovable.dev" target="_blank" rel="noopener"><span class="card-icon">💖</span><div class="card-text"><div class="card-name">Lovable</div><div class="card-desc">AI 웹앱 생성</div></div></a>
+  <a class="card" href="https://windsurf.com" target="_blank" rel="noopener"><span class="card-icon">🏄</span><div class="card-text"><div class="card-name">Windsurf</div><div class="card-desc">AI IDE</div></div></a>
+  <a class="card" href="https://kiro.dev" target="_blank" rel="noopener"><span class="card-icon">⚙️</span><div class="card-text"><div class="card-name">Kiro</div><div class="card-desc">AI 개발 도구</div></div></a>
+  <a class="card" href="https://openai.com/ko-KR/codex" target="_blank" rel="noopener"><span class="card-icon">🧠</span><div class="card-text"><div class="card-name">Codex</div><div class="card-desc">OpenAI Codex</div></div></a>
+  <a class="card" href="https://manus.im" target="_blank" rel="noopener"><span class="card-icon">🦾</span><div class="card-text"><div class="card-name">Manus</div><div class="card-desc">AI 에이전트</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">코드 & 개발 도구</div><div class="cards">
+  <a class="card" href="https://github.com" target="_blank" rel="noopener"><span class="card-icon">🐙</span><div class="card-text"><div class="card-name">GitHub</div><div class="card-desc">코드 저장소</div></div></a>
+  <a class="card" href="https://code.visualstudio.com" target="_blank" rel="noopener"><span class="card-icon">🔵</span><div class="card-text"><div class="card-name">VS Code</div><div class="card-desc">코드 에디터</div></div></a>
+  <a class="card" href="https://vercel.com" target="_blank" rel="noopener"><span class="card-icon">▲</span><div class="card-text"><div class="card-name">Vercel</div><div class="card-desc">프론트엔드 배포</div></div></a>
+  <a class="card" href="https://www.netlify.com" target="_blank" rel="noopener"><span class="card-icon">🟩</span><div class="card-text"><div class="card-name">Netlify</div><div class="card-desc">정적 사이트 배포</div></div></a>
+  <a class="card" href="https://firebase.google.com" target="_blank" rel="noopener"><span class="card-icon">🔥</span><div class="card-text"><div class="card-name">Firebase</div><div class="card-desc">Google 백엔드</div></div></a>
+  <a class="card" href="https://supabase.com" target="_blank" rel="noopener"><span class="card-icon">🟢</span><div class="card-text"><div class="card-name">Supabase</div><div class="card-desc">오픈소스 DB</div></div></a>
+  <a class="card" href="https://codepen.io" target="_blank" rel="noopener"><span class="card-icon">🖊️</span><div class="card-text"><div class="card-name">CodePen</div><div class="card-desc">HTML/CSS/JS 테스트</div></div></a>
+  <a class="card" href="https://replit.com" target="_blank" rel="noopener"><span class="card-icon">💻</span><div class="card-text"><div class="card-name">Replit</div><div class="card-desc">온라인 IDE</div></div></a>
+  <a class="card" href="https://stackblitz.com" target="_blank" rel="noopener"><span class="card-icon">⚡</span><div class="card-text"><div class="card-name">StackBlitz</div><div class="card-desc">웹 개발 환경</div></div></a>
+  <a class="card" href="https://glitch.com" target="_blank" rel="noopener"><span class="card-icon">🎏</span><div class="card-text"><div class="card-name">Glitch</div><div class="card-desc">빠른 웹앱 제작</div></div></a>
+  <a class="card" href="https://railway.app" target="_blank" rel="noopener"><span class="card-icon">🚂</span><div class="card-text"><div class="card-name">Railway</div><div class="card-desc">풀스택 배포</div></div></a>
+  <a class="card" href="https://pages.cloudflare.com" target="_blank" rel="noopener"><span class="card-icon">☁️</span><div class="card-text"><div class="card-name">Cloudflare Pages</div><div class="card-desc">무료 정적 배포</div></div></a>
+  <a class="card" href="https://developer.mozilla.org" target="_blank" rel="noopener"><span class="card-icon">📖</span><div class="card-text"><div class="card-name">MDN Web Docs</div><div class="card-desc">웹 개발 교과서</div></div></a>
+  <a class="card" href="https://stackoverflow.com" target="_blank" rel="noopener"><span class="card-icon">❓</span><div class="card-text"><div class="card-name">Stack Overflow</div><div class="card-desc">개발자 Q&amp;A</div></div></a>
+  <a class="card" href="https://www.npmjs.com" target="_blank" rel="noopener"><span class="card-icon">📦</span><div class="card-text"><div class="card-name">NPM</div><div class="card-desc">JS 패키지</div></div></a>
+  <a class="card" href="https://visualstudio.microsoft.com" target="_blank" rel="noopener"><span class="card-icon">🟣</span><div class="card-text"><div class="card-name">Visual Studio</div><div class="card-desc">Microsoft IDE</div></div></a>
+  <a class="card" href="https://developer.android.com/studio?hl=ko" target="_blank" rel="noopener"><span class="card-icon">🤖</span><div class="card-text"><div class="card-name">Android Studio</div><div class="card-desc">안드로이드 개발</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">코딩 학습</div><div class="cards">
+  <a class="card" href="https://www.freecodecamp.org" target="_blank" rel="noopener"><span class="card-icon">🔥</span><div class="card-text"><div class="card-name">freeCodeCamp</div><div class="card-desc">무료 웹 개발</div></div></a>
+  <a class="card" href="https://www.codecademy.com" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">Codecademy</div><div class="card-desc">인터랙티브 코딩</div></div></a>
+  <a class="card" href="https://www.w3schools.com" target="_blank" rel="noopener"><span class="card-icon">🌐</span><div class="card-text"><div class="card-name">W3Schools</div><div class="card-desc">HTML/CSS/JS 레퍼런스</div></div></a>
+  <a class="card" href="https://javascript.info" target="_blank" rel="noopener"><span class="card-icon">📘</span><div class="card-text"><div class="card-name">JavaScript.info</div><div class="card-desc">JS 완벽 가이드</div></div></a>
+  <a class="card" href="https://leetcode.com" target="_blank" rel="noopener"><span class="card-icon">🏆</span><div class="card-text"><div class="card-name">LeetCode</div><div class="card-desc">알고리즘 문제</div></div></a>
+  <a class="card" href="https://www.codewars.com" target="_blank" rel="noopener"><span class="card-icon">⚔️</span><div class="card-text"><div class="card-name">Codewars</div><div class="card-desc">코딩 챌린지</div></div></a>
+  <a class="card" href="https://www.hackerrank.com" target="_blank" rel="noopener"><span class="card-icon">💼</span><div class="card-text"><div class="card-name">HackerRank</div><div class="card-desc">코딩 테스트</div></div></a>
+  <a class="card" href="https://www.theodinproject.com" target="_blank" rel="noopener"><span class="card-icon">⚡</span><div class="card-text"><div class="card-name">The Odin Project</div><div class="card-desc">풀스택 커리큘럼</div></div></a>
+  <a class="card" href="https://react.dev" target="_blank" rel="noopener"><span class="card-icon">⚛️</span><div class="card-text"><div class="card-name">React 공식 문서</div><div class="card-desc">리액트 학습</div></div></a>
+  <a class="card" href="https://tailwindcss.com" target="_blank" rel="noopener"><span class="card-icon">🌊</span><div class="card-text"><div class="card-name">Tailwind CSS</div><div class="card-desc">CSS 프레임워크</div></div></a>
+  <a class="card" href="https://opentutorials.org" target="_blank" rel="noopener"><span class="card-icon">🌱</span><div class="card-text"><div class="card-name">생활코딩</div><div class="card-desc">웹 개발 입문</div></div></a>
+  <a class="card" href="https://nomadcoders.co" target="_blank" rel="noopener"><span class="card-icon">🧳</span><div class="card-text"><div class="card-name">노마드코더</div><div class="card-desc">클론 코딩 강의</div></div></a>
+  <a class="card" href="https://www.inflearn.com" target="_blank" rel="noopener"><span class="card-icon">📗</span><div class="card-text"><div class="card-name">인프런</div><div class="card-desc">개발 강의</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">데이터 & AI 실험</div><div class="cards">
+  <a class="card" href="https://colab.research.google.com" target="_blank" rel="noopener"><span class="card-icon">🔬</span><div class="card-text"><div class="card-name">Google Colab</div><div class="card-desc">클라우드 Jupyter</div></div></a>
+  <a class="card" href="https://huggingface.co" target="_blank" rel="noopener"><span class="card-icon">🤗</span><div class="card-text"><div class="card-name">Hugging Face</div><div class="card-desc">AI 모델 허브</div></div></a>
+  <a class="card" href="https://www.kaggle.com" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">Kaggle</div><div class="card-desc">데이터 분석·ML</div></div></a>
+  <a class="card" href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener"><span class="card-icon">🤖</span><div class="card-text"><div class="card-name">Teachable Machine</div><div class="card-desc">노코드 ML</div></div></a>
+  <a class="card" href="https://paperswithcode.com" target="_blank" rel="noopener"><span class="card-icon">📄</span><div class="card-text"><div class="card-name">Papers with Code</div><div class="card-desc">논문+코드</div></div></a>
+  <a class="card" href="https://observablehq.com" target="_blank" rel="noopener"><span class="card-icon">👁️</span><div class="card-text"><div class="card-name">Observable</div><div class="card-desc">데이터 시각화</div></div></a>
+  <a class="card" href="https://flourish.studio" target="_blank" rel="noopener"><span class="card-icon">🌸</span><div class="card-text"><div class="card-name">Flourish</div><div class="card-desc">인터랙티브 차트</div></div></a>
+  <a class="card" href="https://replicate.com" target="_blank" rel="noopener"><span class="card-icon">🔁</span><div class="card-text"><div class="card-name">Replicate</div><div class="card-desc">AI 모델 API</div></div></a>
+  <a class="card" href="https://jupyter.org" target="_blank" rel="noopener"><span class="card-icon">📓</span><div class="card-text"><div class="card-name">Jupyter</div><div class="card-desc">대화형 노트북</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">PPT & 발표</div><div class="cards">
+  <a class="card" href="https://www.canva.com/create-new" target="_blank" rel="noopener"><span class="card-icon">🎨</span><div class="card-text"><div class="card-name">Canva</div><div class="card-desc">디자인 툴</div></div></a>
+  <a class="card" href="https://www.miricanvas.com/ko" target="_blank" rel="noopener"><span class="card-icon">🎀</span><div class="card-text"><div class="card-name">MiriCanvas</div><div class="card-desc">미리캔버스</div></div></a>
+  <a class="card" href="https://www.mangoboard.net" target="_blank" rel="noopener"><span class="card-icon">🥭</span><div class="card-text"><div class="card-name">망고보드</div><div class="card-desc">한국형 디자인 툴</div></div></a>
+  <a class="card" href="https://slides.google.com" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">구글 프레젠테이션</div><div class="card-desc">협업 PPT</div></div></a>
+  <a class="card" href="https://gamma.app" target="_blank" rel="noopener"><span class="card-icon">🌀</span><div class="card-text"><div class="card-name">Gamma</div><div class="card-desc">AI 프레젠테이션</div></div></a>
+  <a class="card" href="https://pitch.com" target="_blank" rel="noopener"><span class="card-icon">🎯</span><div class="card-text"><div class="card-name">Pitch</div><div class="card-desc">협업 발표 툴</div></div></a>
+  <a class="card" href="https://tome.app" target="_blank" rel="noopener"><span class="card-icon">📖</span><div class="card-text"><div class="card-name">Tome</div><div class="card-desc">AI 스토리텔링</div></div></a>
+  <a class="card" href="https://prezi.com" target="_blank" rel="noopener"><span class="card-icon">🌐</span><div class="card-text"><div class="card-name">Prezi</div><div class="card-desc">동적 프레젠테이션</div></div></a>
+  <a class="card" href="https://genially.com" target="_blank" rel="noopener"><span class="card-icon">✨</span><div class="card-text"><div class="card-name">Genially</div><div class="card-desc">인터랙티브 발표</div></div></a>
+  <a class="card" href="https://www.beautiful.ai" target="_blank" rel="noopener"><span class="card-icon">💎</span><div class="card-text"><div class="card-name">Beautiful.ai</div><div class="card-desc">AI PPT 자동 정렬</div></div></a>
+  <a class="card" href="https://slidesgo.com" target="_blank" rel="noopener"><span class="card-icon">🎁</span><div class="card-text"><div class="card-name">Slidesgo</div><div class="card-desc">무료 PPT 템플릿</div></div></a>
+  <a class="card" href="https://piktochart.com" target="_blank" rel="noopener"><span class="card-icon">📉</span><div class="card-text"><div class="card-name">Piktochart</div><div class="card-desc">인포그래픽</div></div></a>
+  <a class="card" href="https://forms.google.com" target="_blank" rel="noopener"><span class="card-icon">📋</span><div class="card-text"><div class="card-name">구글 설문지</div><div class="card-desc">설문·퀴즈 제작</div></div></a>
+  <a class="card" href="https://forms.office.com" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">Microsoft Forms</div><div class="card-desc">MS 설문</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">디자인 & 에셋</div><div class="cards">
+  <a class="card" href="https://www.figma.com" target="_blank" rel="noopener"><span class="card-icon">🖌️</span><div class="card-text"><div class="card-name">Figma</div><div class="card-desc">UI/UX 협업 툴</div></div></a>
+  <a class="card" href="https://unsplash.com" target="_blank" rel="noopener"><span class="card-icon">📷</span><div class="card-text"><div class="card-name">Unsplash</div><div class="card-desc">무료 고화질 사진</div></div></a>
+  <a class="card" href="https://www.pexels.com" target="_blank" rel="noopener"><span class="card-icon">🖼️</span><div class="card-text"><div class="card-name">Pexels</div><div class="card-desc">무료 사진·영상</div></div></a>
+  <a class="card" href="https://pixabay.com" target="_blank" rel="noopener"><span class="card-icon">🎞️</span><div class="card-text"><div class="card-name">Pixabay</div><div class="card-desc">무료 미디어</div></div></a>
+  <a class="card" href="https://www.flaticon.com" target="_blank" rel="noopener"><span class="card-icon">🔣</span><div class="card-text"><div class="card-name">Flaticon</div><div class="card-desc">무료 아이콘</div></div></a>
+  <a class="card" href="https://icons8.com" target="_blank" rel="noopener"><span class="card-icon">🎨</span><div class="card-text"><div class="card-name">Icons8</div><div class="card-desc">아이콘·일러스트</div></div></a>
+  <a class="card" href="https://fonts.google.com" target="_blank" rel="noopener"><span class="card-icon">🔤</span><div class="card-text"><div class="card-name">Google Fonts</div><div class="card-desc">무료 폰트</div></div></a>
+  <a class="card" href="https://noonnu.cc" target="_blank" rel="noopener"><span class="card-icon">🗛</span><div class="card-text"><div class="card-name">눈누</div><div class="card-desc">무료 한글 폰트</div></div></a>
+  <a class="card" href="https://colorhunt.co" target="_blank" rel="noopener"><span class="card-icon">🎨</span><div class="card-text"><div class="card-name">Color Hunt</div><div class="card-desc">컬러 팔레트</div></div></a>
+  <a class="card" href="https://coolors.co" target="_blank" rel="noopener"><span class="card-icon">🌈</span><div class="card-text"><div class="card-name">Coolors</div><div class="card-desc">색상 조합 생성</div></div></a>
+  <a class="card" href="https://www.adobe.com/express" target="_blank" rel="noopener"><span class="card-icon">🔴</span><div class="card-text"><div class="card-name">Adobe Express</div><div class="card-desc">간편 디자인</div></div></a>
+  <a class="card" href="https://dribbble.com" target="_blank" rel="noopener"><span class="card-icon">🏀</span><div class="card-text"><div class="card-name">Dribbble</div><div class="card-desc">디자인 포트폴리오</div></div></a>
+  <a class="card" href="https://www.behance.net" target="_blank" rel="noopener"><span class="card-icon">🎭</span><div class="card-text"><div class="card-name">Behance</div><div class="card-desc">크리에이티브 갤러리</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">사진 & 영상 편집</div><div class="cards">
+  <a class="card" href="https://www.capcut.com" target="_blank" rel="noopener"><span class="card-icon">✂️</span><div class="card-text"><div class="card-name">CapCut</div><div class="card-desc">영상 편집</div></div></a>
+  <a class="card" href="https://www.blackmagicdesign.com/products/davinciresolve" target="_blank" rel="noopener"><span class="card-icon">🎬</span><div class="card-text"><div class="card-name">DaVinci Resolve</div><div class="card-desc">전문 영상 편집·색보정</div></div></a>
+  <a class="card" href="https://www.adobe.com/products/premiere.html" target="_blank" rel="noopener"><span class="card-icon">🔴</span><div class="card-text"><div class="card-name">Adobe Premiere Pro</div><div class="card-desc">전문 영상 편집</div></div></a>
+  <a class="card" href="https://www.adobe.com/products/photoshop.html" target="_blank" rel="noopener"><span class="card-icon">🖼️</span><div class="card-text"><div class="card-name">Adobe Photoshop</div><div class="card-desc">이미지 편집</div></div></a>
+  <a class="card" href="https://www.adobe.com/products/illustrator.html" target="_blank" rel="noopener"><span class="card-icon">🖊️</span><div class="card-text"><div class="card-name">Adobe Illustrator</div><div class="card-desc">벡터 그래픽</div></div></a>
+  <a class="card" href="https://www.adobe.com/products/aftereffects.html" target="_blank" rel="noopener"><span class="card-icon">✨</span><div class="card-text"><div class="card-name">Adobe After Effects</div><div class="card-desc">모션 그래픽·VFX</div></div></a>
+  <a class="card" href="https://www.adobe.com/products/photoshop-lightroom.html" target="_blank" rel="noopener"><span class="card-icon">📷</span><div class="card-text"><div class="card-name">Adobe Lightroom</div><div class="card-desc">사진 보정</div></div></a>
+  <a class="card" href="https://www.adobe.com/products/audition.html" target="_blank" rel="noopener"><span class="card-icon">🎙️</span><div class="card-text"><div class="card-name">Adobe Audition</div><div class="card-desc">오디오 편집</div></div></a>
+  <a class="card" href="https://www.photopea.com" target="_blank" rel="noopener"><span class="card-icon">🖼️</span><div class="card-text"><div class="card-name">Photopea</div><div class="card-desc">웹 무료 포토샵</div></div></a>
+  <a class="card" href="https://www.remove.bg" target="_blank" rel="noopener"><span class="card-icon">🪄</span><div class="card-text"><div class="card-name">Remove.bg</div><div class="card-desc">배경 제거</div></div></a>
+  <a class="card" href="https://www.veed.io" target="_blank" rel="noopener"><span class="card-icon">🎬</span><div class="card-text"><div class="card-name">VEED</div><div class="card-desc">온라인 영상 편집</div></div></a>
+  <a class="card" href="https://www.kapwing.com" target="_blank" rel="noopener"><span class="card-icon">🎥</span><div class="card-text"><div class="card-name">Kapwing</div><div class="card-desc">미디어 편집</div></div></a>
+  <a class="card" href="https://cleanup.pictures" target="_blank" rel="noopener"><span class="card-icon">🧹</span><div class="card-text"><div class="card-name">Cleanup.pictures</div><div class="card-desc">이미지 요소 제거</div></div></a>
+  <a class="card" href="https://tinypng.com" target="_blank" rel="noopener"><span class="card-icon">🐼</span><div class="card-text"><div class="card-name">TinyPNG</div><div class="card-desc">이미지 압축</div></div></a>
+  <a class="card" href="https://squoosh.app" target="_blank" rel="noopener"><span class="card-icon">🗜️</span><div class="card-text"><div class="card-name">Squoosh</div><div class="card-desc">이미지 최적화</div></div></a>
+  <a class="card" href="https://pixlr.com" target="_blank" rel="noopener"><span class="card-icon">✏️</span><div class="card-text"><div class="card-name">Pixlr</div><div class="card-desc">온라인 사진 편집</div></div></a>
+  <a class="card" href="https://www.descript.com" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">Descript</div><div class="card-desc">AI 영상·팟캐스트</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">3D & 메이커</div><div class="cards">
+  <a class="card" href="https://www.blender.org" target="_blank" rel="noopener"><span class="card-icon">🫐</span><div class="card-text"><div class="card-name">Blender</div><div class="card-desc">3D 오픈소스</div></div></a>
+  <a class="card" href="https://unity.com" target="_blank" rel="noopener"><span class="card-icon">🕹️</span><div class="card-text"><div class="card-name">Unity</div><div class="card-desc">게임·시뮬레이션</div></div></a>
+  <a class="card" href="https://www.unrealengine.com" target="_blank" rel="noopener"><span class="card-icon">🎮</span><div class="card-text"><div class="card-name">Unreal Engine</div><div class="card-desc">고퀄리티 3D</div></div></a>
+  <a class="card" href="https://spline.design" target="_blank" rel="noopener"><span class="card-icon">🌐</span><div class="card-text"><div class="card-name">Spline</div><div class="card-desc">웹 3D 디자인</div></div></a>
+  <a class="card" href="https://www.tinkercad.com" target="_blank" rel="noopener"><span class="card-icon">🧱</span><div class="card-text"><div class="card-name">Tinkercad</div><div class="card-desc">3D 모델링·아두이노</div></div></a>
+  <a class="card" href="https://sketchfab.com" target="_blank" rel="noopener"><span class="card-icon">🗿</span><div class="card-text"><div class="card-name">Sketchfab</div><div class="card-desc">3D 모델 공유</div></div></a>
+  <a class="card" href="https://www.autodesk.com/products/fusion-360" target="_blank" rel="noopener"><span class="card-icon">⚙️</span><div class="card-text"><div class="card-name">Fusion 360</div><div class="card-desc">3D CAD/CAM</div></div></a>
+  <a class="card" href="https://www.sketchup.com" target="_blank" rel="noopener"><span class="card-icon">🏗️</span><div class="card-text"><div class="card-name">SketchUp</div><div class="card-desc">건축·인테리어 3D</div></div></a>
+  <a class="card" href="https://polyhaven.com" target="_blank" rel="noopener"><span class="card-icon">🌿</span><div class="card-text"><div class="card-name">Poly Haven</div><div class="card-desc">무료 3D 에셋</div></div></a>
+  <a class="card" href="https://www.thingiverse.com" target="_blank" rel="noopener"><span class="card-icon">🖨️</span><div class="card-text"><div class="card-name">Thingiverse</div><div class="card-desc">3D 프린팅 파일</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">게임 & 인터랙티브 제작</div><div class="cards">
+  <a class="card" href="https://scratch.mit.edu" target="_blank" rel="noopener"><span class="card-icon">🐱</span><div class="card-text"><div class="card-name">Scratch</div><div class="card-desc">MIT 블록 코딩</div></div></a>
+  <a class="card" href="https://create.roblox.com" target="_blank" rel="noopener"><span class="card-icon">🟥</span><div class="card-text"><div class="card-name">Roblox Studio</div><div class="card-desc">로블록스 게임 제작</div></div></a>
+  <a class="card" href="https://godotengine.org" target="_blank" rel="noopener"><span class="card-icon">🤖</span><div class="card-text"><div class="card-name">Godot</div><div class="card-desc">무료 게임 엔진</div></div></a>
+  <a class="card" href="https://gdevelop.io" target="_blank" rel="noopener"><span class="card-icon">🎲</span><div class="card-text"><div class="card-name">GDevelop</div><div class="card-desc">노코드 게임 제작</div></div></a>
+  <a class="card" href="https://makecode.microbit.org" target="_blank" rel="noopener"><span class="card-icon">💻</span><div class="card-text"><div class="card-name">MakeCode</div><div class="card-desc">마이크로비트 코딩</div></div></a>
+  <a class="card" href="https://www.construct.net" target="_blank" rel="noopener"><span class="card-icon">🏗️</span><div class="card-text"><div class="card-name">Construct</div><div class="card-desc">2D 게임 엔진</div></div></a>
+  <a class="card" href="https://twinery.org" target="_blank" rel="noopener"><span class="card-icon">📖</span><div class="card-text"><div class="card-name">Twine</div><div class="card-desc">인터랙티브 스토리</div></div></a>
+  <a class="card" href="https://www.piskelapp.com" target="_blank" rel="noopener"><span class="card-icon">🎮</span><div class="card-text"><div class="card-name">Piskel</div><div class="card-desc">픽셀 아트 제작</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">수학 & 과학</div><div class="cards">
+  <a class="card" href="https://www.desmos.com" target="_blank" rel="noopener"><span class="card-icon">📈</span><div class="card-text"><div class="card-name">Desmos</div><div class="card-desc">그래핑 계산기</div></div></a>
+  <a class="card" href="https://www.geogebra.org" target="_blank" rel="noopener"><span class="card-icon">📐</span><div class="card-text"><div class="card-name">GeoGebra</div><div class="card-desc">수학·물리 시각화</div></div></a>
+  <a class="card" href="https://www.wolframalpha.com" target="_blank" rel="noopener"><span class="card-icon">🧮</span><div class="card-text"><div class="card-name">WolframAlpha</div><div class="card-desc">수학 연산 엔진</div></div></a>
+  <a class="card" href="https://www.symbolab.com" target="_blank" rel="noopener"><span class="card-icon">➗</span><div class="card-text"><div class="card-name">Symbolab</div><div class="card-desc">수학 풀이</div></div></a>
+  <a class="card" href="https://www.mathway.com" target="_blank" rel="noopener"><span class="card-icon">📏</span><div class="card-text"><div class="card-name">Mathway</div><div class="card-desc">수학 문제 풀이</div></div></a>
+  <a class="card" href="https://phet.colorado.edu" target="_blank" rel="noopener"><span class="card-icon">⚗️</span><div class="card-text"><div class="card-name">PhET</div><div class="card-desc">물리·화학 시뮬</div></div></a>
+  <a class="card" href="https://brilliant.org" target="_blank" rel="noopener"><span class="card-icon">💡</span><div class="card-text"><div class="card-name">Brilliant</div><div class="card-desc">수학·과학 학습</div></div></a>
+  <a class="card" href="https://stellarium-web.org" target="_blank" rel="noopener"><span class="card-icon">🌠</span><div class="card-text"><div class="card-name">Stellarium Web</div><div class="card-desc">온라인 천문관</div></div></a>
+  <a class="card" href="https://eyes.nasa.gov" target="_blank" rel="noopener"><span class="card-icon">🚀</span><div class="card-text"><div class="card-name">NASA Eyes</div><div class="card-desc">태양계 시뮬</div></div></a>
+  <a class="card" href="https://molview.org" target="_blank" rel="noopener"><span class="card-icon">🧬</span><div class="card-text"><div class="card-name">MolView</div><div class="card-desc">분자 구조 시각화</div></div></a>
+  <a class="card" href="https://qanda.ai" target="_blank" rel="noopener"><span class="card-icon">📸</span><div class="card-text"><div class="card-name">콴다</div><div class="card-desc">수학 문제 촬영풀이</div></div></a>
+  <a class="card" href="https://www.ebsmath.co.kr" target="_blank" rel="noopener"><span class="card-icon">📺</span><div class="card-text"><div class="card-name">EBSMath</div><div class="card-desc">수학 전문 인강</div></div></a>
+  <a class="card" href="https://www.zocbo.com" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">족보닷컴</div><div class="card-desc">학교 기출문제</div></div></a>
+  <a class="card" href="https://www.kice.re.kr" target="_blank" rel="noopener"><span class="card-icon">📋</span><div class="card-text"><div class="card-name">평가원 기출</div><div class="card-desc">수능 기출문제</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">교육 콘텐츠</div><div class="cards">
+  <a class="card" href="https://ed.ted.com" target="_blank" rel="noopener"><span class="card-icon">🎤</span><div class="card-text"><div class="card-name">TED-Ed</div><div class="card-desc">교육 영상</div></div></a>
+  <a class="card" href="https://www.coursera.org" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">Coursera</div><div class="card-desc">대학 강의 온라인</div></div></a>
+  <a class="card" href="https://www.edx.org" target="_blank" rel="noopener"><span class="card-icon">📘</span><div class="card-text"><div class="card-name">edX</div><div class="card-desc">MIT·하버드 강의</div></div></a>
+  <a class="card" href="https://www.udemy.com" target="_blank" rel="noopener"><span class="card-icon">📗</span><div class="card-text"><div class="card-name">Udemy</div><div class="card-desc">실무 강의</div></div></a>
+  <a class="card" href="https://ocw.mit.edu" target="_blank" rel="noopener"><span class="card-icon">🏛️</span><div class="card-text"><div class="card-name">MIT OpenCourseWare</div><div class="card-desc">MIT 무료 강의</div></div></a>
+  <a class="card" href="https://ko.khanacademy.org" target="_blank" rel="noopener"><span class="card-icon">🏫</span><div class="card-text"><div class="card-name">Khan Academy</div><div class="card-desc">무료 개념 강의</div></div></a>
+  <a class="card" href="https://openstax.org" target="_blank" rel="noopener"><span class="card-icon">📚</span><div class="card-text"><div class="card-name">OpenStax</div><div class="card-desc">무료 교과서</div></div></a>
+  <a class="card" href="https://class101.net" target="_blank" rel="noopener"><span class="card-icon">🎨</span><div class="card-text"><div class="card-name">Class101</div><div class="card-desc">취미·크리에이티브</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">한국 인강</div><div class="cards">
+  <a class="card" href="https://www.ebsi.co.kr" target="_blank" rel="noopener"><span class="card-icon">📺</span><div class="card-text"><div class="card-name">EBSi</div><div class="card-desc">수능·내신 인강</div></div></a>
+  <a class="card" href="https://www.megastudy.net" target="_blank" rel="noopener"><span class="card-icon">⭐</span><div class="card-text"><div class="card-name">메가스터디</div><div class="card-desc">수능 전문 인강</div></div></a>
+  <a class="card" href="https://www.etoos.com" target="_blank" rel="noopener"><span class="card-icon">📡</span><div class="card-text"><div class="card-name">이투스</div><div class="card-desc">수능 인강</div></div></a>
+  <a class="card" href="https://www.mimacstudy.com" target="_blank" rel="noopener"><span class="card-icon">🎯</span><div class="card-text"><div class="card-name">대성마이맥</div><div class="card-desc">수능 인강</div></div></a>
+  <a class="card" href="https://www.skyedu.com" target="_blank" rel="noopener"><span class="card-icon">🌤️</span><div class="card-text"><div class="card-name">스카이에듀</div><div class="card-desc">수능 인강</div></div></a>
+  <a class="card" href="https://edu.ingang.go.kr" target="_blank" rel="noopener"><span class="card-icon">🏛️</span><div class="card-text"><div class="card-name">강남구청 수능방송</div><div class="card-desc">무료 수능 강의</div></div></a>
+  <a class="card" href="https://www.kmooc.kr" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">K-MOOC</div><div class="card-desc">대학 전공 무료</div></div></a>
+  <a class="card" href="http://www.kocw.net" target="_blank" rel="noopener"><span class="card-icon">📡</span><div class="card-text"><div class="card-name">KOCW</div><div class="card-desc">열린강좌</div></div></a>
+  <a class="card" href="https://cls.edunet.net" target="_blank" rel="noopener"><span class="card-icon">🏫</span><div class="card-text"><div class="card-name">e학습터</div><div class="card-desc">교육부 공식 학습</div></div></a>
+  <a class="card" href="https://www.classting.com" target="_blank" rel="noopener"><span class="card-icon">📢</span><div class="card-text"><div class="card-name">클래스팅</div><div class="card-desc">학급 소통 플랫폼</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">퀴즈 & 수업 참여</div><div class="cards">
+  <a class="card" href="https://kahoot.com" target="_blank" rel="noopener"><span class="card-icon">🎉</span><div class="card-text"><div class="card-name">Kahoot</div><div class="card-desc">퀴즈 게임</div></div></a>
+  <a class="card" href="https://quizizz.com" target="_blank" rel="noopener"><span class="card-icon">❓</span><div class="card-text"><div class="card-name">Quizizz</div><div class="card-desc">퀴즈 플랫폼</div></div></a>
+  <a class="card" href="https://www.blooket.com" target="_blank" rel="noopener"><span class="card-icon">📦</span><div class="card-text"><div class="card-name">Blooket</div><div class="card-desc">게임형 퀴즈</div></div></a>
+  <a class="card" href="https://www.mentimeter.com" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">Mentimeter</div><div class="card-desc">실시간 투표·퀴즈</div></div></a>
+  <a class="card" href="https://www.slido.com" target="_blank" rel="noopener"><span class="card-icon">🙋</span><div class="card-text"><div class="card-name">Slido</div><div class="card-desc">Q&amp;A·투표</div></div></a>
+  <a class="card" href="https://quizlet.com" target="_blank" rel="noopener"><span class="card-icon">🃏</span><div class="card-text"><div class="card-name">Quizlet</div><div class="card-desc">플래시카드 학습</div></div></a>
+  <a class="card" href="https://www.classcard.net" target="_blank" rel="noopener"><span class="card-icon">🗂️</span><div class="card-text"><div class="card-name">클래스카드</div><div class="card-desc">단어·암기 카드</div></div></a>
+  <a class="card" href="https://nearpod.com" target="_blank" rel="noopener"><span class="card-icon">📡</span><div class="card-text"><div class="card-name">Nearpod</div><div class="card-desc">인터랙티브 수업</div></div></a>
+  <a class="card" href="https://padlet.com" target="_blank" rel="noopener"><span class="card-icon">📌</span><div class="card-text"><div class="card-name">Padlet</div><div class="card-desc">온라인 게시판</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">논문 & 리서치</div><div class="cards">
+  <a class="card" href="https://scholar.google.com" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">Google Scholar</div><div class="card-desc">학술 논문 검색</div></div></a>
+  <a class="card" href="https://www.riss.kr" target="_blank" rel="noopener"><span class="card-icon">📚</span><div class="card-text"><div class="card-name">RISS</div><div class="card-desc">국내 학위 논문</div></div></a>
+  <a class="card" href="https://www.dbpia.co.kr" target="_blank" rel="noopener"><span class="card-icon">📰</span><div class="card-text"><div class="card-name">DBpia</div><div class="card-desc">한국 학술 저널</div></div></a>
+  <a class="card" href="https://arxiv.org" target="_blank" rel="noopener"><span class="card-icon">🔬</span><div class="card-text"><div class="card-name">arXiv</div><div class="card-desc">최신 논문 무료</div></div></a>
+  <a class="card" href="https://www.semanticscholar.org" target="_blank" rel="noopener"><span class="card-icon">🧠</span><div class="card-text"><div class="card-name">Semantic Scholar</div><div class="card-desc">AI 논문 검색</div></div></a>
+  <a class="card" href="https://www.connectedpapers.com" target="_blank" rel="noopener"><span class="card-icon">🕸️</span><div class="card-text"><div class="card-name">Connected Papers</div><div class="card-desc">논문 연관 시각화</div></div></a>
+  <a class="card" href="https://www.researchrabbit.ai" target="_blank" rel="noopener"><span class="card-icon">🐇</span><div class="card-text"><div class="card-name">ResearchRabbit</div><div class="card-desc">연관 논문 추천</div></div></a>
+  <a class="card" href="https://scite.ai" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">Scite</div><div class="card-desc">논문 인용 분석</div></div></a>
+  <a class="card" href="https://www.zotero.org" target="_blank" rel="noopener"><span class="card-icon">🗂️</span><div class="card-text"><div class="card-name">Zotero</div><div class="card-desc">참고문헌 관리</div></div></a>
+  <a class="card" href="https://www.kci.go.kr" target="_blank" rel="noopener"><span class="card-icon">🏛️</span><div class="card-text"><div class="card-name">KCI</div><div class="card-desc">한국학술지인용색인</div></div></a>
+  <a class="card" href="https://scienceon.kisti.re.kr" target="_blank" rel="noopener"><span class="card-icon">🔭</span><div class="card-text"><div class="card-name">ScienceON</div><div class="card-desc">과학기술 인프라</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">자료 조사</div><div class="cards">
+  <a class="card" href="https://terms.naver.com" target="_blank" rel="noopener"><span class="card-icon">📖</span><div class="card-text"><div class="card-name">네이버 지식백과</div><div class="card-desc">백과사전</div></div></a>
+  <a class="card" href="https://academic.naver.com" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">네이버 학술정보</div><div class="card-desc">학술 자료 검색</div></div></a>
+  <a class="card" href="https://kosis.kr" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">KOSIS</div><div class="card-desc">국가통계포털</div></div></a>
+  <a class="card" href="https://www.data.go.kr" target="_blank" rel="noopener"><span class="card-icon">🗃️</span><div class="card-text"><div class="card-name">공공데이터포털</div><div class="card-desc">정부 공공 데이터</div></div></a>
+  <a class="card" href="https://stdict.korean.go.kr" target="_blank" rel="noopener"><span class="card-icon">🔤</span><div class="card-text"><div class="card-name">표준국어대사전</div><div class="card-desc">국립국어원</div></div></a>
+  <a class="card" href="https://opendict.korean.go.kr" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">우리말샘</div><div class="card-desc">개방형 국어사전</div></div></a>
+  <a class="card" href="https://db.history.go.kr" target="_blank" rel="noopener"><span class="card-icon">🏯</span><div class="card-text"><div class="card-name">한국사데이터베이스</div><div class="card-desc">국사편찬위원회</div></div></a>
+  <a class="card" href="https://encykorea.aks.ac.kr" target="_blank" rel="noopener"><span class="card-icon">📜</span><div class="card-text"><div class="card-name">한국민족문화대백과</div><div class="card-desc">한국학중앙연구원</div></div></a>
+  <a class="card" href="https://www.law.go.kr" target="_blank" rel="noopener"><span class="card-icon">⚖️</span><div class="card-text"><div class="card-name">국가법령정보센터</div><div class="card-desc">법령 검색</div></div></a>
+  <a class="card" href="https://news.naver.com" target="_blank" rel="noopener"><span class="card-icon">📰</span><div class="card-text"><div class="card-name">네이버 뉴스</div><div class="card-desc">뉴스 검색</div></div></a>
+  <a class="card" href="https://www.nl.go.kr" target="_blank" rel="noopener"><span class="card-icon">📚</span><div class="card-text"><div class="card-name">국립중앙도서관</div><div class="card-desc">디지털 컬렉션</div></div></a>
+  <a class="card" href="https://www.nanet.go.kr" target="_blank" rel="noopener"><span class="card-icon">🏛️</span><div class="card-text"><div class="card-name">국회도서관</div><div class="card-desc">입법 자료</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">메모 & 정리</div><div class="cards">
+  <a class="card" href="https://www.notion.so" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">Notion</div><div class="card-desc">올인원 워크스페이스</div></div></a>
+  <a class="card" href="https://keep.google.com" target="_blank" rel="noopener"><span class="card-icon">💛</span><div class="card-text"><div class="card-name">Google Keep</div><div class="card-desc">빠른 메모</div></div></a>
+  <a class="card" href="https://www.onenote.com" target="_blank" rel="noopener"><span class="card-icon">🟣</span><div class="card-text"><div class="card-name">OneNote</div><div class="card-desc">MS 노트 앱</div></div></a>
+  <a class="card" href="https://evernote.com" target="_blank" rel="noopener"><span class="card-icon">🐘</span><div class="card-text"><div class="card-name">Evernote</div><div class="card-desc">노트 관리</div></div></a>
+  <a class="card" href="https://obsidian.md" target="_blank" rel="noopener"><span class="card-icon">💎</span><div class="card-text"><div class="card-name">Obsidian</div><div class="card-desc">마크다운 지식 베이스</div></div></a>
+  <a class="card" href="https://logseq.com" target="_blank" rel="noopener"><span class="card-icon">🔗</span><div class="card-text"><div class="card-name">Logseq</div><div class="card-desc">아웃라이너 노트</div></div></a>
+  <a class="card" href="https://www.remnote.com" target="_blank" rel="noopener"><span class="card-icon">🧠</span><div class="card-text"><div class="card-name">RemNote</div><div class="card-desc">노트+플래시카드</div></div></a>
+  <a class="card" href="https://apps.ankiweb.net" target="_blank" rel="noopener"><span class="card-icon">🃏</span><div class="card-text"><div class="card-name">Anki</div><div class="card-desc">망각곡선 암기</div></div></a>
+  <a class="card" href="https://memo.naver.com" target="_blank" rel="noopener"><span class="card-icon">🟢</span><div class="card-text"><div class="card-name">네이버 메모</div><div class="card-desc">간편 메모</div></div></a>
+  <a class="card" href="https://mybox.naver.com" target="_blank" rel="noopener"><span class="card-icon">📦</span><div class="card-text"><div class="card-name">네이버 MYBOX</div><div class="card-desc">클라우드 저장소</div></div></a>
+  <a class="card" href="https://raindrop.io" target="_blank" rel="noopener"><span class="card-icon">💧</span><div class="card-text"><div class="card-name">Raindrop.io</div><div class="card-desc">북마크 관리</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">문서 & 글쓰기</div><div class="cards">
+  <a class="card" href="https://docs.google.com" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">Google Docs</div><div class="card-desc">실시간 문서 협업</div></div></a>
+  <a class="card" href="https://sheets.google.com" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">Google Sheets</div><div class="card-desc">스프레드시트</div></div></a>
+  <a class="card" href="https://www.hancomdocs.com" target="_blank" rel="noopener"><span class="card-icon">🇰🇷</span><div class="card-text"><div class="card-name">한컴독스</div><div class="card-desc">한글 온라인</div></div></a>
+  <a class="card" href="https://office.naver.com" target="_blank" rel="noopener"><span class="card-icon">🟢</span><div class="card-text"><div class="card-name">네이버 오피스</div><div class="card-desc">웹 오피스</div></div></a>
+  <a class="card" href="https://www.grammarly.com" target="_blank" rel="noopener"><span class="card-icon">✅</span><div class="card-text"><div class="card-name">Grammarly</div><div class="card-desc">영어 문법 교정</div></div></a>
+  <a class="card" href="https://www.deepl.com/write" target="_blank" rel="noopener"><span class="card-icon">✍️</span><div class="card-text"><div class="card-name">DeepL Write</div><div class="card-desc">AI 글쓰기</div></div></a>
+  <a class="card" href="https://quillbot.com" target="_blank" rel="noopener"><span class="card-icon">🦜</span><div class="card-text"><div class="card-name">QuillBot</div><div class="card-desc">패러프레이징</div></div></a>
+  <a class="card" href="https://www.smallpdf.com" target="_blank" rel="noopener"><span class="card-icon">📄</span><div class="card-text"><div class="card-name">Smallpdf</div><div class="card-desc">PDF 변환·편집</div></div></a>
+  <a class="card" href="https://www.ilovepdf.com" target="_blank" rel="noopener"><span class="card-icon">❤️</span><div class="card-text"><div class="card-name">ILovePDF</div><div class="card-desc">PDF 병합·압축</div></div></a>
+  <a class="card" href="https://typed.do" target="_blank" rel="noopener"><span class="card-icon">⌨️</span><div class="card-text"><div class="card-name">타입드</div><div class="card-desc">리서치 통합 문서</div></div></a>
+  <a class="card" href="https://brunch.co.kr" target="_blank" rel="noopener"><span class="card-icon">✍️</span><div class="card-text"><div class="card-name">브런치스토리</div><div class="card-desc">작가 글 플랫폼</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">독서</div><div class="cards">
+  <a class="card" href="https://www.millie.co.kr" target="_blank" rel="noopener"><span class="card-icon">📱</span><div class="card-text"><div class="card-name">밀리의 서재</div><div class="card-desc">전자책 구독</div></div></a>
+  <a class="card" href="https://www.yes24.com" target="_blank" rel="noopener"><span class="card-icon">📚</span><div class="card-text"><div class="card-name">YES24</div><div class="card-desc">도서 구매</div></div></a>
+  <a class="card" href="https://www.aladin.co.kr" target="_blank" rel="noopener"><span class="card-icon">📗</span><div class="card-text"><div class="card-name">알라딘</div><div class="card-desc">도서·중고책</div></div></a>
+  <a class="card" href="https://www.kyobobook.co.kr" target="_blank" rel="noopener"><span class="card-icon">📘</span><div class="card-text"><div class="card-name">교보문고</div><div class="card-desc">도서·전자책</div></div></a>
+  <a class="card" href="https://www.welaaa.com" target="_blank" rel="noopener"><span class="card-icon">🎧</span><div class="card-text"><div class="card-name">윌라</div><div class="card-desc">오디오북</div></div></a>
+  <a class="card" href="https://medium.com" target="_blank" rel="noopener"><span class="card-icon">📰</span><div class="card-text"><div class="card-name">Medium</div><div class="card-desc">영어 아티클</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">영어 & 어학</div><div class="cards">
+  <a class="card" href="https://papago.naver.com" target="_blank" rel="noopener"><span class="card-icon">🌐</span><div class="card-text"><div class="card-name">파파고</div><div class="card-desc">네이버 번역</div></div></a>
+  <a class="card" href="https://www.deepl.com" target="_blank" rel="noopener"><span class="card-icon">🔵</span><div class="card-text"><div class="card-name">DeepL</div><div class="card-desc">고품질 번역</div></div></a>
+  <a class="card" href="https://en.dict.naver.com" target="_blank" rel="noopener"><span class="card-icon">📖</span><div class="card-text"><div class="card-name">네이버 영어사전</div><div class="card-desc">영한·한영 사전</div></div></a>
+  <a class="card" href="https://www.duolingo.com" target="_blank" rel="noopener"><span class="card-icon">🦜</span><div class="card-text"><div class="card-name">Duolingo</div><div class="card-desc">언어 학습 앱</div></div></a>
+  <a class="card" href="https://mycake.me" target="_blank" rel="noopener"><span class="card-icon">🎂</span><div class="card-text"><div class="card-name">Cake</div><div class="card-desc">영상으로 영어</div></div></a>
+  <a class="card" href="https://www.malhaeboca.com" target="_blank" rel="noopener"><span class="card-icon">💬</span><div class="card-text"><div class="card-name">말해보카</div><div class="card-desc">영단어 학습</div></div></a>
+  <a class="card" href="https://ja.dict.naver.com" target="_blank" rel="noopener"><span class="card-icon">🇯🇵</span><div class="card-text"><div class="card-name">네이버 일본어사전</div><div class="card-desc">일한 사전</div></div></a>
+  <a class="card" href="https://zh.dict.naver.com" target="_blank" rel="noopener"><span class="card-icon">🇨🇳</span><div class="card-text"><div class="card-name">네이버 중국어사전</div><div class="card-desc">중한 사전</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">웹 유틸리티</div><div class="cards">
+  <a class="card" href="https://www.qrcode-monkey.com" target="_blank" rel="noopener"><span class="card-icon">📱</span><div class="card-text"><div class="card-name">QR Code Monkey</div><div class="card-desc">QR코드 생성</div></div></a>
+  <a class="card" href="https://app.diagrams.net" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">Draw.io</div><div class="card-desc">순서도·다이어그램</div></div></a>
+  <a class="card" href="https://excalidraw.com" target="_blank" rel="noopener"><span class="card-icon">✏️</span><div class="card-text"><div class="card-name">Excalidraw</div><div class="card-desc">손그림 화이트보드</div></div></a>
+  <a class="card" href="https://carbon.now.sh" target="_blank" rel="noopener"><span class="card-icon">🖼️</span><div class="card-text"><div class="card-name">Carbon</div><div class="card-desc">코드 이미지 생성</div></div></a>
+  <a class="card" href="https://regex101.com" target="_blank" rel="noopener"><span class="card-icon">🔣</span><div class="card-text"><div class="card-name">Regex101</div><div class="card-desc">정규표현식 테스트</div></div></a>
+  <a class="card" href="https://wetransfer.com" target="_blank" rel="noopener"><span class="card-icon">📤</span><div class="card-text"><div class="card-name">WeTransfer</div><div class="card-desc">대용량 파일 전송</div></div></a>
+  <a class="card" href="https://convertio.co" target="_blank" rel="noopener"><span class="card-icon">🔄</span><div class="card-text"><div class="card-name">Convertio</div><div class="card-desc">파일 형식 변환</div></div></a>
+  <a class="card" href="https://www.loom.com" target="_blank" rel="noopener"><span class="card-icon">🎥</span><div class="card-text"><div class="card-name">Loom</div><div class="card-desc">화면 녹화 공유</div></div></a>
+  <a class="card" href="https://temp-mail.org" target="_blank" rel="noopener"><span class="card-icon">📧</span><div class="card-text"><div class="card-name">Temp Mail</div><div class="card-desc">임시 이메일</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">협업 & 화이트보드</div><div class="cards">
+  <a class="card" href="https://discord.com" target="_blank" rel="noopener"><span class="card-icon">🎮</span><div class="card-text"><div class="card-name">Discord</div><div class="card-desc">커뮤니티·음성</div></div></a>
+  <a class="card" href="https://slack.com" target="_blank" rel="noopener"><span class="card-icon">💬</span><div class="card-text"><div class="card-name">Slack</div><div class="card-desc">팀 메신저</div></div></a>
+  <a class="card" href="https://miro.com" target="_blank" rel="noopener"><span class="card-icon">🗒️</span><div class="card-text"><div class="card-name">Miro</div><div class="card-desc">온라인 화이트보드</div></div></a>
+  <a class="card" href="https://www.figma.com/figjam" target="_blank" rel="noopener"><span class="card-icon">🎨</span><div class="card-text"><div class="card-name">FigJam</div><div class="card-desc">Figma 화이트보드</div></div></a>
+  <a class="card" href="https://whimsical.com" target="_blank" rel="noopener"><span class="card-icon">🌀</span><div class="card-text"><div class="card-name">Whimsical</div><div class="card-desc">플로우차트·마인드맵</div></div></a>
+  <a class="card" href="https://www.mindmeister.com" target="_blank" rel="noopener"><span class="card-icon">🧠</span><div class="card-text"><div class="card-name">MindMeister</div><div class="card-desc">마인드맵</div></div></a>
+  <a class="card" href="https://coggle.it" target="_blank" rel="noopener"><span class="card-icon">🌿</span><div class="card-text"><div class="card-name">Coggle</div><div class="card-desc">협업 마인드맵</div></div></a>
+  <a class="card" href="https://trello.com" target="_blank" rel="noopener"><span class="card-icon">📌</span><div class="card-text"><div class="card-name">Trello</div><div class="card-desc">칸반 보드</div></div></a>
+  <a class="card" href="https://www.lucidchart.com" target="_blank" rel="noopener"><span class="card-icon">📐</span><div class="card-text"><div class="card-name">Lucidchart</div><div class="card-desc">다이어그램</div></div></a>
+  <a class="card" href="https://zoom.us" target="_blank" rel="noopener"><span class="card-icon">📹</span><div class="card-text"><div class="card-name">Zoom</div><div class="card-desc">화상 회의</div></div></a>
+  <a class="card" href="https://meet.google.com" target="_blank" rel="noopener"><span class="card-icon">📹</span><div class="card-text"><div class="card-name">Google Meet</div><div class="card-desc">구글 화상 회의</div></div></a>
+  <a class="card" href="https://milanote.com" target="_blank" rel="noopener"><span class="card-icon">🖼️</span><div class="card-text"><div class="card-name">Milanote</div><div class="card-desc">비주얼 노트보드</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">알고리즘 & 개발 커뮤니티</div><div class="cards">
+  <a class="card" href="https://www.acmicpc.net" target="_blank" rel="noopener"><span class="card-icon">🏆</span><div class="card-text"><div class="card-name">백준 (BOJ)</div><div class="card-desc">알고리즘 문제풀이</div></div></a>
+  <a class="card" href="https://programmers.co.kr" target="_blank" rel="noopener"><span class="card-icon">💼</span><div class="card-text"><div class="card-name">프로그래머스</div><div class="card-desc">코딩 테스트 연습</div></div></a>
+  <a class="card" href="https://codeforces.com" target="_blank" rel="noopener"><span class="card-icon">🌍</span><div class="card-text"><div class="card-name">Codeforces</div><div class="card-desc">해외 알고리즘</div></div></a>
+  <a class="card" href="https://velog.io" target="_blank" rel="noopener"><span class="card-icon">✍️</span><div class="card-text"><div class="card-name">Velog</div><div class="card-desc">개발 기술 블로그</div></div></a>
+  <a class="card" href="https://github.com/trending" target="_blank" rel="noopener"><span class="card-icon">🔥</span><div class="card-text"><div class="card-name">GitHub Trending</div><div class="card-desc">핫한 오픈소스</div></div></a>
+  <a class="card" href="https://news.hada.io" target="_blank" rel="noopener"><span class="card-icon">📰</span><div class="card-text"><div class="card-name">GeekNews</div><div class="card-desc">국내 IT 뉴스</div></div></a>
+  <a class="card" href="https://news.ycombinator.com" target="_blank" rel="noopener"><span class="card-icon">🗞️</span><div class="card-text"><div class="card-name">Hacker News</div><div class="card-desc">실리콘밸리 테크</div></div></a>
+  <a class="card" href="https://okky.kr" target="_blank" rel="noopener"><span class="card-icon">🇰🇷</span><div class="card-text"><div class="card-name">OKKY</div><div class="card-desc">국내 개발자 커뮤니티</div></div></a>
+  <a class="card" href="https://hashnode.com" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">Hashnode</div><div class="card-desc">개발자 블로그</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">학생 커뮤니티</div><div class="cards">
+  <a class="card" href="https://orbi.kr" target="_blank" rel="noopener"><span class="card-icon">🌀</span><div class="card-text"><div class="card-name">오르비</div><div class="card-desc">수험생 커뮤니티</div></div></a>
+  <a class="card" href="https://everytime.kr" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">에브리타임</div><div class="card-desc">대학생 커뮤니티</div></div></a>
+  <a class="card" href="https://cafe.naver.com/suhui" target="_blank" rel="noopener"><span class="card-icon">📚</span><div class="card-text"><div class="card-name">수만휘</div><div class="card-desc">수능 정보 카페</div></div></a>
+  <a class="card" href="https://www.yeolpumta.com" target="_blank" rel="noopener"><span class="card-icon">🔥</span><div class="card-text"><div class="card-name">열품타</div><div class="card-desc">공부 시간 측정</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">입시 & 진로</div><div class="cards">
+  <a class="card" href="https://www.adiga.kr" target="_blank" rel="noopener"><span class="card-icon">🎓</span><div class="card-text"><div class="card-name">어디가</div><div class="card-desc">대입정보포털</div></div></a>
+  <a class="card" href="https://www.academyinfo.go.kr" target="_blank" rel="noopener"><span class="card-icon">🏛️</span><div class="card-text"><div class="card-name">대학알리미</div><div class="card-desc">대학 공식 정보</div></div></a>
+  <a class="card" href="https://www.career.go.kr" target="_blank" rel="noopener"><span class="card-icon">🧭</span><div class="card-text"><div class="card-name">커리어넷</div><div class="card-desc">적성검사·직업 탐색</div></div></a>
+  <a class="card" href="https://www.work.go.kr" target="_blank" rel="noopener"><span class="card-icon">💼</span><div class="card-text"><div class="card-name">워크넷</div><div class="card-desc">취업·직업 정보</div></div></a>
+  <a class="card" href="https://www.jinhak.com" target="_blank" rel="noopener"><span class="card-icon">📊</span><div class="card-text"><div class="card-name">진학사</div><div class="card-desc">입시 합격 예측</div></div></a>
+  <a class="card" href="https://www.uway.com" target="_blank" rel="noopener"><span class="card-icon">🗺️</span><div class="card-text"><div class="card-name">유웨이</div><div class="card-desc">대입 전략</div></div></a>
+  <a class="card" href="https://linkareer.com" target="_blank" rel="noopener"><span class="card-icon">🔗</span><div class="card-text"><div class="card-name">링커리어</div><div class="card-desc">대학생 대외활동</div></div></a>
+  <a class="card" href="https://www.campuspick.com" target="_blank" rel="noopener"><span class="card-icon">🏫</span><div class="card-text"><div class="card-name">캠퍼스픽</div><div class="card-desc">대학생 공모전</div></div></a>
+  <a class="card" href="https://www.wanted.co.kr" target="_blank" rel="noopener"><span class="card-icon">🎯</span><div class="card-text"><div class="card-name">Wanted</div><div class="card-desc">IT 채용</div></div></a>
+  <a class="card" href="https://www.linkedin.com" target="_blank" rel="noopener"><span class="card-icon">💼</span><div class="card-text"><div class="card-name">LinkedIn</div><div class="card-desc">글로벌 커리어</div></div></a>
+  <a class="card" href="https://www.neis.go.kr" target="_blank" rel="noopener"><span class="card-icon">📋</span><div class="card-text"><div class="card-name">나이스 대국민서비스</div><div class="card-desc">생기부·성적 확인</div></div></a>
+  <a class="card" href="https://www.schoolinfo.go.kr" target="_blank" rel="noopener"><span class="card-icon">🏫</span><div class="card-text"><div class="card-name">학교알리미</div><div class="card-desc">학교 공식 정보</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">시간관리 & 집중</div><div class="cards">
+  <a class="card" href="https://www.yeolpumta.com" target="_blank" rel="noopener"><span class="card-icon">🔥</span><div class="card-text"><div class="card-name">열품타</div><div class="card-desc">공부 시간 측정</div></div></a>
+  <a class="card" href="https://pomofocus.io" target="_blank" rel="noopener"><span class="card-icon">🍅</span><div class="card-text"><div class="card-name">Pomofocus</div><div class="card-desc">뽀모도로 타이머</div></div></a>
+  <a class="card" href="https://www.todomate.net" target="_blank" rel="noopener"><span class="card-icon">✅</span><div class="card-text"><div class="card-name">투두메이트</div><div class="card-desc">할 일 관리</div></div></a>
+  <a class="card" href="https://todoist.com" target="_blank" rel="noopener"><span class="card-icon">📋</span><div class="card-text"><div class="card-name">Todoist</div><div class="card-desc">투두 리스트</div></div></a>
+  <a class="card" href="https://ticktick.com" target="_blank" rel="noopener"><span class="card-icon">⏱️</span><div class="card-text"><div class="card-name">TickTick</div><div class="card-desc">할 일+타이머</div></div></a>
+  <a class="card" href="https://calendar.google.com" target="_blank" rel="noopener"><span class="card-icon">📅</span><div class="card-text"><div class="card-name">Google Calendar</div><div class="card-desc">일정 관리</div></div></a>
+  <a class="card" href="https://calendar.naver.com" target="_blank" rel="noopener"><span class="card-icon">🗓️</span><div class="card-text"><div class="card-name">네이버 캘린더</div><div class="card-desc">일정·D-day</div></div></a>
+  <a class="card" href="https://www.forestapp.cc" target="_blank" rel="noopener"><span class="card-icon">🌳</span><div class="card-text"><div class="card-name">Forest</div><div class="card-desc">집중하면 나무 성장</div></div></a>
+  <a class="card" href="https://lifeat.io" target="_blank" rel="noopener"><span class="card-icon">🏡</span><div class="card-text"><div class="card-name">LifeAt</div><div class="card-desc">가상 스터디룸</div></div></a>
+  <a class="card" href="https://www.noisli.com" target="_blank" rel="noopener"><span class="card-icon">🎵</span><div class="card-text"><div class="card-name">Noisli</div><div class="card-desc">백색소음 믹싱</div></div></a>
+  <a class="card" href="https://habitica.com" target="_blank" rel="noopener"><span class="card-icon">⚔️</span><div class="card-text"><div class="card-name">Habitica</div><div class="card-desc">습관 RPG 게임</div></div></a>
+  <a class="card" href="https://www.chlngers.com" target="_blank" rel="noopener"><span class="card-icon">🏆</span><div class="card-text"><div class="card-name">챌린저스</div><div class="card-desc">습관 챌린지</div></div></a>
+</div></div>
+
+<div class="category"><div class="cat-label">SNS & 영상 플랫폼</div><div class="cards">
+  <a class="card" href="https://www.youtube.com" target="_blank" rel="noopener"><span class="card-icon">▶️</span><div class="card-text"><div class="card-name">YouTube</div><div class="card-desc">동영상 플랫폼</div></div></a>
+  <a class="card" href="https://www.instagram.com" target="_blank" rel="noopener"><span class="card-icon">📸</span><div class="card-text"><div class="card-name">Instagram</div><div class="card-desc">사진·릴스 SNS</div></div></a>
+  <a class="card" href="https://www.tiktok.com" target="_blank" rel="noopener"><span class="card-icon">🎵</span><div class="card-text"><div class="card-name">TikTok</div><div class="card-desc">숏폼 영상</div></div></a>
+  <a class="card" href="https://www.twitch.tv" target="_blank" rel="noopener"><span class="card-icon">🟣</span><div class="card-text"><div class="card-name">Twitch</div><div class="card-desc">라이브 스트리밍</div></div></a>
+  <a class="card" href="https://chzzk.naver.com" target="_blank" rel="noopener"><span class="card-icon">🟢</span><div class="card-text"><div class="card-name">치지직</div><div class="card-desc">네이버 라이브</div></div></a>
+  <a class="card" href="https://www.afreecatv.com" target="_blank" rel="noopener"><span class="card-icon">🔴</span><div class="card-text"><div class="card-name">아프리카TV</div><div class="card-desc">한국 라이브 방송</div></div></a>
+  <a class="card" href="https://vimeo.com" target="_blank" rel="noopener"><span class="card-icon">🎬</span><div class="card-text"><div class="card-name">Vimeo</div><div class="card-desc">고화질 영상 공유</div></div></a>
+  <a class="card" href="https://x.com" target="_blank" rel="noopener"><span class="card-icon">✖️</span><div class="card-text"><div class="card-name">X (Twitter)</div><div class="card-desc">실시간 소통·뉴스</div></div></a>
+  <a class="card" href="https://www.threads.net" target="_blank" rel="noopener"><span class="card-icon">🧵</span><div class="card-text"><div class="card-name">Threads</div><div class="card-desc">Meta 텍스트 SNS</div></div></a>
+  <a class="card" href="https://www.facebook.com" target="_blank" rel="noopener"><span class="card-icon">📘</span><div class="card-text"><div class="card-name">Facebook</div><div class="card-desc">글로벌 소셜 네트워크</div></div></a>
+  <a class="card" href="https://www.pinterest.com" target="_blank" rel="noopener"><span class="card-icon">📌</span><div class="card-text"><div class="card-name">Pinterest</div><div class="card-desc">이미지 큐레이션</div></div></a>
+  <a class="card" href="https://www.tumblr.com" target="_blank" rel="noopener"><span class="card-icon">🔵</span><div class="card-text"><div class="card-name">Tumblr</div><div class="card-desc">블로그형 SNS</div></div></a>
+  <a class="card" href="https://www.reddit.com" target="_blank" rel="noopener"><span class="card-icon">🤖</span><div class="card-text"><div class="card-name">Reddit</div><div class="card-desc">커뮤니티 포럼</div></div></a>
+  <a class="card" href="https://open.kakao.com" target="_blank" rel="noopener"><span class="card-icon">💛</span><div class="card-text"><div class="card-name">카카오톡</div><div class="card-desc">오픈채팅·메신저</div></div></a>
+  <a class="card" href="https://line.me" target="_blank" rel="noopener"><span class="card-icon">💚</span><div class="card-text"><div class="card-name">LINE</div><div class="card-desc">메신저·SNS</div></div></a>
+  <a class="card" href="https://telegram.org" target="_blank" rel="noopener"><span class="card-icon">✈️</span><div class="card-text"><div class="card-name">Telegram</div><div class="card-desc">보안 메신저</div></div></a>
+  <a class="card" href="https://discord.com" target="_blank" rel="noopener"><span class="card-icon">🎮</span><div class="card-text"><div class="card-name">Discord</div><div class="card-desc">커뮤니티·음성채팅</div></div></a>
+  <a class="card" href="https://www.snapchat.com" target="_blank" rel="noopener"><span class="card-icon">👻</span><div class="card-text"><div class="card-name">Snapchat</div><div class="card-desc">사라지는 사진·스토리</div></div></a>
+  <a class="card" href="https://www.linkedin.com" target="_blank" rel="noopener"><span class="card-icon">💼</span><div class="card-text"><div class="card-name">LinkedIn</div><div class="card-desc">비즈니스 네트워크</div></div></a>
+  <a class="card" href="https://band.us" target="_blank" rel="noopener"><span class="card-icon">🎗️</span><div class="card-text"><div class="card-name">Band</div><div class="card-desc">네이버 밴드</div></div></a>
+  <a class="card" href="https://cafe.naver.com" target="_blank" rel="noopener"><span class="card-icon">☕</span><div class="card-text"><div class="card-name">네이버 카페</div><div class="card-desc">커뮤니티·동호회</div></div></a>
+  <a class="card" href="https://blog.naver.com" target="_blank" rel="noopener"><span class="card-icon">📝</span><div class="card-text"><div class="card-name">네이버 블로그</div><div class="card-desc">블로그 플랫폼</div></div></a>
+  <a class="card" href="https://velog.io" target="_blank" rel="noopener"><span class="card-icon">✍️</span><div class="card-text"><div class="card-name">Velog</div><div class="card-desc">개발자 블로그</div></div></a>
+  <a class="card" href="https://brunch.co.kr" target="_blank" rel="noopener"><span class="card-icon">🥂</span><div class="card-text"><div class="card-name">브런치스토리</div><div class="card-desc">카카오 글쓰기 플랫폼</div></div></a>
+  <a class="card" href="https://bsky.app" target="_blank" rel="noopener"><span class="card-icon">🦋</span><div class="card-text"><div class="card-name">Bluesky</div><div class="card-desc">탈중앙화 소셜</div></div></a>
+  <a class="card" href="https://www.weverse.io" target="_blank" rel="noopener"><span class="card-icon">🌸</span><div class="card-text"><div class="card-name">Weverse</div><div class="card-desc">K-POP 팬 커뮤니티</div></div></a>
+  <a class="card" href="https://www.whatsapp.com" target="_blank" rel="noopener"><span class="card-icon">📱</span><div class="card-text"><div class="card-name">WhatsApp</div><div class="card-desc">글로벌 메신저</div></div></a>
+  <a class="card" href="https://signal.org" target="_blank" rel="noopener"><span class="card-icon">🔒</span><div class="card-text"><div class="card-name">Signal</div><div class="card-desc">프라이버시 메신저</div></div></a>
+  <a class="card" href="https://www.clubhouse.com" target="_blank" rel="noopener"><span class="card-icon">🎤</span><div class="card-text"><div class="card-name">Clubhouse</div><div class="card-desc">음성 소셜 앱</div></div></a>
+</div></div>
+
+</main>
+<footer>© 2026 DSHS 1-9 All rights reserved. Developed by <span style="color:var(--mint)">Choi ju yeong</span></footer>
+<script>
+  document.getElementById('stb').addEventListener('click', () => {
+    const w = document.getElementById('sw');
+    const o = w.classList.toggle('open');
+    if (o) document.getElementById('search').focus();
+    else { document.getElementById('search').value = ''; filterCards(); }
+  });
+  function filterCards() {
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    document.querySelectorAll('.category').forEach(cat => {
+      let v = 0;
+      cat.querySelectorAll('.card').forEach(c => {
+        const s = !q || c.innerText.toLowerCase().includes(q);
+        c.classList.toggle('hidden', !s);
+        if (s) v++;
+      });
+      cat.style.display = v === 0 && q ? 'none' : '';
+    });
+  }
+</script>
+</body>
+</html>
