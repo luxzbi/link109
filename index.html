@@ -172,6 +172,36 @@
       border-color: rgba(74, 222, 128, 0.25);
     }
 
+    /* ── Quasarway Accordion ── */
+    .qw-toggle {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .qw-toggle:hover .section-label.highsystem {
+      background: rgba(74, 222, 128, 0.18);
+    }
+
+    .qw-chevron {
+      font-size: 0.72rem;
+      margin-left: 4px;
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+
+    .qw-chevron.open {
+      transform: rotate(180deg);
+    }
+
+    .qw-grid {
+      display: none;
+      overflow: hidden;
+    }
+
+    .qw-grid.open {
+      display: grid;
+    }
+
     .section-label.suhaeng {
       color: #fb923c;
       background: rgba(251, 146, 60, 0.1);
@@ -733,21 +763,6 @@
           <div class="card-name">1-9 아지트 <span class="badge-haktuksa">학특사</span></div>
           <div class="card-url">ds109.life</div>
         </a>
-        <a class="card" href="https://ztec.kr" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">주식게임-CCX v1 <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">ztec.kr</div>
-        </a>
-        <a class="card" href="https://luxzbi.github.io/CIP/" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">CIP 시간표 <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">luxzbi.github.io/CIP</div>
-        </a>
-        <a class="card" href="https://luxzbi.github.io/time/" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">자습 타이머 도구 <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">luxzbi.github.io/time</div>
-        </a>
         <a class="card" href="https://bettercip.pages.dev/" target="_blank" rel="noopener">
           <span class="card-arrow">↗</span>
           <div class="card-name">1-9 betterCIP by kmk</div>
@@ -758,46 +773,16 @@
           <div class="card-name">betterCIP 개인 출석 설정</div>
           <div class="card-url">bettercip.pages.dev/student</div>
         </a>
-        <a class="card" href="https://plax-eta.vercel.app" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">Secret Garden <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">plax-eta.vercel.app</div>
-        </a>
-        <a class="card" href="/gateway" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">Gateway <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">link109.xyz/gateway</div>
-        </a>
-        <a class="card" href="/milestone" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">Milestone <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">link109.xyz/milestone</div>
-        </a>
-        <a class="card" href="/gateway/timeway.html" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">Timeway <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">link109.xyz/gateway/timeway</div>
-        </a>
-        <a class="card" href="https://bytenode109.vercel.app" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">bytenode <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">bytenode109.vercel.app</div>
-        </a>
-        <a class="card" href="https://byteexam109.vercel.app" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">byteexam <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">byteexam109.vercel.app</div>
-        </a>
       </div>
     </section>
 
-    <!-- Quasarway group 카테고리 -->
-    <section class="section">
-      <div class="section-header">
-        <span class="section-label highsystem">Quasarway group</span>
+    <!-- Quasarway group 카테고리 (아코디언) -->
+    <section class="section" id="quasarway-section">
+      <div class="section-header qw-toggle" onclick="toggleQW()" id="quasarway-toggle">
+        <span class="section-label highsystem">Quasarway group <span class="qw-chevron" id="qwChevron">▼</span></span>
         <div class="section-line"></div>
       </div>
-      <div class="grid">
+      <div class="grid qw-grid" id="quasarway-grid">
         <a class="card highsystem" href="https://plax-eta.vercel.app" target="_blank" rel="noopener">
           <span class="card-arrow">↗</span>
           <div class="card-name">Secret Garden <span class="badge-haktuksa">학특사</span></div>
@@ -818,6 +803,11 @@
           <div class="card-name">Timeway <span class="badge-haktuksa">학특사</span></div>
           <div class="card-url">link109.xyz/gateway/timeway</div>
         </a>
+        <a class="card highsystem" href="https://bytenode109.vercel.app" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">bytenode <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">bytenode109.vercel.app</div>
+        </a>
         <a class="card highsystem" href="https://ztec.kr" target="_blank" rel="noopener">
           <span class="card-arrow">↗</span>
           <div class="card-name">주식게임-CCX v1 <span class="badge-haktuksa">학특사</span></div>
@@ -832,16 +822,6 @@
           <span class="card-arrow">↗</span>
           <div class="card-name">자습 타이머 도구 <span class="badge-haktuksa">학특사</span></div>
           <div class="card-url">luxzbi.github.io/time</div>
-        </a>
-        <a class="card highsystem" href="https://bytenode109.vercel.app" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">bytenode <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">bytenode109.vercel.app</div>
-        </a>
-        <a class="card highsystem" href="https://byteexam109.vercel.app" target="_blank" rel="noopener">
-          <span class="card-arrow">↗</span>
-          <div class="card-name">byteexam <span class="badge-haktuksa">학특사</span></div>
-          <div class="card-url">byteexam109.vercel.app</div>
         </a>
       </div>
     </section>
@@ -964,6 +944,17 @@
     const mobileSearchBtn = document.getElementById('mobileSearchBtn');
     const isMobile = () => window.innerWidth <= 600;
 
+    // Quasarway accordion
+    const qwGrid    = document.getElementById('quasarway-grid');
+    const qwChevron = document.getElementById('qwChevron');
+    let qwOpen = false;
+
+    function toggleQW(forceOpen) {
+      qwOpen = forceOpen !== undefined ? forceOpen : !qwOpen;
+      qwGrid.classList.toggle('open', qwOpen);
+      qwChevron.classList.toggle('open', qwOpen);
+    }
+
     mobileSearchBtn.addEventListener('click', () => {
       const open = searchBox.classList.toggle('open');
       if (open) {
@@ -1000,6 +991,13 @@
 
         section.style.display = sectionVisible > 0 ? '' : 'none';
         totalVisible += sectionVisible;
+
+        // 검색 시 Quasarway 아코디언 자동 열기/닫기
+        if (section.id === 'quasarway-section' && q) {
+          toggleQW(sectionVisible > 0);
+        } else if (section.id === 'quasarway-section' && !q) {
+          toggleQW(false);
+        }
       });
 
       noResults.style.display = q && totalVisible === 0 ? 'block' : 'none';
