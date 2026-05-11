@@ -416,6 +416,7 @@
     .src-hw { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.25); }
     .src-gw { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
     .src-ms { background: rgba(45,212,191,0.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
+    .src-qw { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
 
     .empty {
       text-align: center;
@@ -517,6 +518,10 @@
               <span class="mode-option-icon"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1.5 6h9M6 1.5v9" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></span>
               Gateway
             </div>
+            <div class="mode-option" data-src="QUASARWAY" data-label="Quasarway">
+              <span class="mode-option-icon"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 1.5"/></svg></span>
+              Quasarway
+            </div>
           </div>
         </div>
       </div>
@@ -549,9 +554,9 @@ const LINKS = [
   {n:'DNA 시뮬레이터',     u:'https://luxzbi.github.io/ss/',       d:'DNA 시뮬레이터',             c:'시뮬레이터',    s:'HIGHWAY', i:'🧬'},
   {n:'볼츠만 뇌 시뮬레이터',u:'https://luxzbi.github.io/chch/',   d:'볼츠만 뇌 이론',            c:'시뮬레이터',    s:'HIGHWAY', i:'🧠'},
   {n:'석굴암 시뮬레이터',  u:'https://luxzbi.github.io/accs',     d:'석굴암 시뮬레이터',          c:'시뮬레이터',    s:'HIGHWAY', i:'🗿'},
-  {n:'Secret Garden',      u:'https://plax-eta.vercel.app',        d:'비밀 게시판',                c:'Quasarway',     s:'HIGHWAY', i:'🌿'},
-  {n:'Gateway',            u:'https://link109.xyz/gateway',        d:'종합 링크 허브',             c:'Quasarway',     s:'HIGHWAY', i:'🌐'},
-  {n:'Milestone',          u:'https://link109.xyz/milestone',      d:'통합 검색 엔진',             c:'Quasarway',     s:'HIGHWAY', i:'🔭'},
+  {n:'Secret Garden',      u:'https://plax-eta.vercel.app',        d:'비밀 게시판 · 학특사',       c:'Quasarway',     s:'QUASARWAY', i:'🌿'},
+  {n:'Gateway',            u:'https://link109.xyz/gateway',        d:'종합 링크 허브 · 학특사',    c:'Quasarway',     s:'QUASARWAY', i:'🌐'},
+  {n:'Milestone',          u:'https://link109.xyz/milestone',      d:'통합 검색 엔진 · 학특사',    c:'Quasarway',     s:'QUASARWAY', i:'🔭'},
   {n:'과학 질의응답',      u:'https://url.kr/vjfvv3',              d:'수행평가 질의응답',           c:'수행평가',      s:'HIGHWAY', i:'🔬'},
   // ── GATEWAY: AI 어시스턴트 ──
   {n:'ChatGPT',            u:'https://chatgpt.com',                d:'OpenAI',                     c:'AI 어시스턴트', s:'GATEWAY', i:'💬'},
@@ -944,8 +949,8 @@ function render() {
     return;
   }
 
-  const srcLabel = {HIGHWAY:'HIGHWAY', GATEWAY:'GATEWAY', MILESTONE:'MILESTONE'};
-  const srcClass = {HIGHWAY:'src-hw', GATEWAY:'src-gw', MILESTONE:'src-ms'};
+  const srcLabel = {HIGHWAY:'HIGHWAY', GATEWAY:'GATEWAY', MILESTONE:'MILESTONE', QUASARWAY:'QUASARWAY'};
+  const srcClass = {HIGHWAY:'src-hw', GATEWAY:'src-gw', MILESTONE:'src-ms', QUASARWAY:'src-qw'};
 
   grid.innerHTML = filtered.map(l => `
     <a class="r-card" href="${l.u}" target="_blank" rel="noopener">
