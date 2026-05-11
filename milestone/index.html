@@ -76,6 +76,31 @@
       text-transform: uppercase;
     }
 
+    .highway-btn {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.5rem;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.85rem;
+      border-radius: 20px;
+      background: rgba(250,204,21,0.08);
+      border: 1px solid rgba(250,204,21,0.22);
+      color: rgba(250,204,21,0.75);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .highway-btn:hover {
+      background: rgba(250,204,21,0.15);
+      color: #facc15;
+      border-color: rgba(250,204,21,0.45);
+    }
+    .highway-btn svg { opacity: 0.8; }
+
     .logo-group {
       display: flex;
       align-items: center;
@@ -464,6 +489,11 @@
   </style>
 </head>
 <body>
+
+<a class="highway-btn" href="https://link109.xyz/highway" target="_blank" rel="noopener">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10 L6 2 L10 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="3.5" y1="7" x2="8.5" y2="7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+  HIGHWAY
+</a>
 
 <a class="top-logo" href="/milestone">
   <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -913,6 +943,10 @@ document.querySelectorAll('.mode-option').forEach(opt => {
     modeDropdown.classList.remove('open');
     modeBtn.classList.remove('open');
     render();
+    if (query.length > 0 || filterSrc) {
+      hero.classList.add('shrunk');
+      results.style.display = 'block';
+    }
   });
 });
 
