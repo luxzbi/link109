@@ -747,7 +747,7 @@
 
     <!-- 빠른 바로가기 -->
     <div class="quick-bar">
-      <a class="quick-btn" href="https://link109.xyz/milestone" target="_blank">🔭 Milestone에서 모든 Quasarway project를 검색하세요! ↗</a>
+      <a class="quick-btn" href="https://link109.xyz/milestone/" target="_blank">🔭 Milestone에서 모든 Quasarway project를 검색하세요! ↗</a>
     </div>
 
     <!-- 학급 카테고리 -->
@@ -811,6 +811,11 @@
           <span class="card-arrow">↗</span>
           <div class="card-name">Quasarway <span class="badge-haktuksa">학특사</span></div>
           <div class="card-url">link109.xyz/quasarway</div>
+        </a>
+        <a class="card highsystem" href="/gateway" target="_blank" rel="noopener">
+          <span class="card-arrow">↗</span>
+          <div class="card-name">Gateway <span class="badge-haktuksa">학특사</span></div>
+          <div class="card-url">link109.xyz/gateway</div>
         </a>
       </div>
     </section>
@@ -888,7 +893,7 @@
           <div class="card-name">볼츠만 뇌 이론 시뮬레이터</div>
           <div class="card-url">luxzbi.github.io/chch</div>
         </a>
-        <a class="card simulator" href="https://luxzbi.github.io/accs" target="_blank" rel="noopener">
+        <a class="card simulator" href="https://luxzbi.github.io/accs/" target="_blank" rel="noopener">
           <span class="card-arrow">↗</span>
           <div class="card-name">석굴암 시뮬레이터</div>
           <div class="card-url">luxzbi.github.io/accs</div>
@@ -951,17 +956,6 @@
 
     searchInput.addEventListener('input', () => runFilter(searchInput.value));
 
-    // Quasarway 아코디언
-    const qwGrid    = document.getElementById('quasarway-grid');
-    const qwChevron = document.getElementById('qwChevron');
-    let qwOpen = false;
-
-    function toggleQW(forceOpen) {
-      qwOpen = forceOpen !== undefined ? forceOpen : !qwOpen;
-      qwGrid.classList.toggle('open', qwOpen);
-      qwChevron.classList.toggle('open', qwOpen);
-    }
-
     function runFilter(query) {
       const q = query.trim().toLowerCase();
       let totalVisible = 0;
@@ -981,10 +975,6 @@
         section.style.display = sectionVisible > 0 ? '' : 'none';
         totalVisible += sectionVisible;
 
-        // 검색 시 Quasarway 아코디언 자동 열기/닫기
-        if (section.id === 'quasarway-section') {
-          toggleQW(q ? sectionVisible > 0 : false);
-        }
       });
 
       noResults.style.display = q && totalVisible === 0 ? 'block' : 'none';
